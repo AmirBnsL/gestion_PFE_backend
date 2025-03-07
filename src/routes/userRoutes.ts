@@ -1,6 +1,6 @@
 import express from 'express';
-import { getUser, createUser, deleteUser } from '../controllers/userController';
-import { userRegistrationSchema, validateData } from '../middleware/validation';
+import { createUser, deleteUser, login } from '../controllers/userController';
+import { userLoginSchema, userRegistrationSchema, validateData } from '../middleware/validation';
 /**
  * @swagger
  * tags:
@@ -62,16 +62,46 @@ import { userRegistrationSchema, validateData } from '../middleware/validation';
  *         description: User not found
  */
 
+/**
+ * @swagger
+ * /api/login:
+ *   post:
+ *     summary: Login with email and password
+ *     tags: [User]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: login successful
+ *       401:
+ *         description: Invalid password
+ *       409:
+ *         description: Entity not found
+ *       404:
+ *         description: Bad request
+ */
+
 
 
 const router = express.Router();
 
-router.get('/user', getUser);
-router.post('/user',validateData(userRegistrationSchema), createUser);
-router.delete('/user', deleteUser);
 
-//router.get("/login", login);
+router.post('/user', validateData(userRegistrationSchema), createUser);
+router.delete('/user', deleteUser);
+router.post('/login', validateData(userLoginSchema), login);
 //router.get("/register", register);
+//router.post("/student",register);
+//router.post("/teacher",register); these are made by the admin
+//admin has already an account and
 
 
 export default router;

@@ -17,6 +17,11 @@ export const userRegistrationSchema = z.object({
     password: passwordSchema,
 });
 
+export const userLoginSchema = z.object({
+    email: z.string().email(),
+    password:z.string(),
+})
+
 export function validateData(schema: z.ZodObject<any, any>) {
     return (req: Request, res: Response, next: NextFunction) => {
         try {

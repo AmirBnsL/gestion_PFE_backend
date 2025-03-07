@@ -7,7 +7,7 @@ import morgan from "morgan";
 
 import { AppDataSource } from './datasource';
 import userRoutes from './routes/userRoutes';
-dotenv.config();
+
 AppDataSource.initialize()
   .then(() => {
       // here you can start to work with your database
@@ -46,3 +46,5 @@ app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 
 });
+
+//TODO : Authorization, Authentication ,CRUD of users,One to one relation ship with users

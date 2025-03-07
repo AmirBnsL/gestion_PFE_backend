@@ -15,3 +15,8 @@ export interface UserRegistrationInputType {
   lastname:string
   email:string
 }
+
+export interface UserLoginInputType {
+  email:string
+  password:string
+}
