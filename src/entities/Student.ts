@@ -1,5 +1,6 @@
 import { User } from './User';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, PrimaryGeneratedColumn,OneToOne } from 'typeorm';
+
 
 @Entity('student')
 export class Student  {
@@ -14,4 +15,9 @@ export class Student  {
 
   @Column()
   phone: string
+
+
+  @OneToOne(() => Student, student => student.user)
+  @JoinColumn()
+  user: User;
 }

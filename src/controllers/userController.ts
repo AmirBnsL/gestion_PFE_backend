@@ -4,18 +4,13 @@ import { UserLoginInputType, UserRegistrationInputType } from '../dtos/userDTOs'
 import { ResponseDTO } from '../dtos/genericDTOs';
 import bcrypt from 'bcryptjs';
 import { EntityNotFoundError, Repository } from 'typeorm';
-import jwt from 'jsonwebtoken';
+
 import { signJwt } from '../middleware/authJwt';
 import { User } from '../entities/User';
-import morgan from 'morgan';
 
 
-interface jwtHeader {
-  alg: string;
-  typ: string;
-}
 
-interface jwtPayload {}
+
 
 export const getUser = (req: Request, res: Response) => {
   const userRepository = AppDataSource.getRepository('User');

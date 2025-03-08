@@ -1,7 +1,6 @@
 
 
 import jwt from "jsonwebtoken"
-import { createPrivateKey } from 'node:crypto';
 import { User } from '../entities/User';
 
 
@@ -38,3 +37,13 @@ export const signJwt = (user: User) => {
 
   return  jwt.sign(payload, secret, options);
 };
+
+const verifyJwt = (token: string) => {
+  if (!process.env['PUBLIC_KEY']) {
+    throw new Error('PUBLIC_KEY is not set');
+  }
+
+  const secret = process.env['PUBLIC_KEY'];
+
+  return jwt.verify(token, secret) as jwtPayload;
+}

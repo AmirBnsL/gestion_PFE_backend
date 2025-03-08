@@ -3,6 +3,10 @@ import { Request, Response } from 'express';
 import { z, ZodError } from 'zod';
 import {StatusCodes} from 'http-status-codes';
 
+/**
+ * Here we put all the validation schemas
+ */
+
 const passwordSchema = z.string()
   .min(8, { message: "Password must be at least 8 characters long" })
   .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
@@ -21,6 +25,13 @@ export const userLoginSchema = z.object({
     email: z.string().email(),
     password:z.string(),
 })
+
+/**
+ * Validate the data against the schema and return an error if the data is invalid
+ *
+ * @param schema
+ */
+
 
 export function validateData(schema: z.ZodObject<any, any>) {
     return (req: Request, res: Response, next: NextFunction) => {

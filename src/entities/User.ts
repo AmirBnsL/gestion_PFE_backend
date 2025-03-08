@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn,OneToOne } from 'typeorm';
+import { Student } from './Student';
+import { Teacher } from './Teacher';
 
 
 export enum UserRole {
@@ -29,4 +31,10 @@ export class User {
 
   @Column()
   passwordHash: string;
+
+  @OneToOne(() => Student, student => student.user)
+  student: Student;
+
+  @OneToOne(() => Teacher, teacher => teacher.user)
+  teacher: Teacher;
 }
