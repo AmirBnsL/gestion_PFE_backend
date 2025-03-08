@@ -7,15 +7,6 @@ export class Student  {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  birthDate: Date;
-
-  @Column()
-  address: string;
-
-  @Column()
-  phone: string
-
 
   @OneToOne(() => Student, student => student.user)
   @JoinColumn()
