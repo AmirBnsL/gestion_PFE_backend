@@ -8,11 +8,14 @@ import { AppDataSource } from './datasource';
 import userRoutes from './routes/userRoutes';
 import { User, UserRole } from './entities/User';
 import { Admin } from './entities/Admin';
+import { runSeeders } from 'typeorm-extension';
 
 AppDataSource.initialize()
   .then(async () => {
       // here you can start to work with your database
       console.log("Database is connected")
+
+    await runSeeders(AppDataSource);
     const userRepository = AppDataSource.getRepository(User);
     const adminRepository = AppDataSource.getRepository(Admin);
 

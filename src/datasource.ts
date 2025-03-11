@@ -16,7 +16,7 @@ const options: DataSourceOptions & SeederOptions = {
   password: 'amir',
   database: 'gestion_pfe',
   synchronize: true,
-  logging: false,
+  logging: true,
   entities: [User, Student, Teacher, Admin],
   subscribers: [],
   migrations: [],
