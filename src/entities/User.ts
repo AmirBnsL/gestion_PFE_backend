@@ -1,6 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn,OneToOne } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, OneToOne, BeforeInsert } from 'typeorm';
 import { Student } from './Student';
 import { Teacher } from './Teacher';
+import { Admin } from './Admin';
+import bcrypt from 'bcryptjs';
 
 
 export enum UserRole {
@@ -37,4 +39,17 @@ export class User {
 
   @OneToOne(() => Teacher, teacher => teacher.user)
   teacher: Teacher;
+
+  @OneToOne(() => Admin, admin => admin.user)
+  admin: Admin;
+
+
+
+
+  @BeforeInsert()
+  hashPassword() {
+    // Hash the password before inserting it into the database
+    this.passwordHash = bcrypt.hashSync(this.passwordHash, 8);
+  }
+
 }

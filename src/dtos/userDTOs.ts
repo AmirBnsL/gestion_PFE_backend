@@ -1,3 +1,4 @@
+import { UserRole } from '../entities/User';
 
 export interface UserType {
   id:number
@@ -14,6 +15,7 @@ export interface UserRegistrationInputType {
   firstname:string
   lastname:string
   email:string
+  role:UserRole
 }
 
 export interface UserLoginInputType {

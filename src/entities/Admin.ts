@@ -11,4 +11,5 @@ export class Admin  {
   @OneToOne(() => User)
   @JoinColumn()
   user: User;
+
 }

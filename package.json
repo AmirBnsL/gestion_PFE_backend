@@ -7,11 +7,16 @@
     "build": "npx tsc",
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
-    "swagger": "ts-node --env-file=.env src/swagger.ts"
+    "swagger": "ts-node --env-file=.env src/swagger.ts",
+    "db:create": "ts-node ./node_modules/typeorm-extension/bin/cli.mjs db:create",
+    "db:drop": "ts-node ./node_modules/typeorm-extension/bin/cli.mjs db:drop",
+    "seed:run": "ts-node ./node_modules/typeorm-extension/bin/cli.mjs -d ./src/datasource.ts seed:run",
+    "seed:create": "ts-node ./node_modules/typeorm-extension/bin/cli.mjs seed:create"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@faker-js/faker": "^9.6.0",
     "bcryptjs": "^3.0.2",
     "express": "^4.21.2",
     "http-status-codes": "^2.3.0",
@@ -23,6 +28,7 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "typeorm": "^0.3.21",
+    "typeorm-extension": "^3.7.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {

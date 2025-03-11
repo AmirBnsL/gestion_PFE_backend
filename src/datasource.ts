@@ -1,24 +1,28 @@
-import { DataSource } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
 import { User } from './entities/User';
 import mysql2 from 'mysql2';
-
 import { Student } from './entities/Student';
 import { Teacher } from './entities/Teacher';
-
-
-
-export const AppDataSource = new DataSource({
-  type: "mysql",
+import { Admin } from './entities/Admin';
+import { SeederOptions } from 'typeorm-extension';
+import { UserSeeder } from './dataloader/seeders';
+import { userFactory } from './dataloader/factories';
+const options: DataSourceOptions & SeederOptions = {
+  type: 'mysql',
   driver: mysql2,
-  host: "localhost",
+  host: 'localhost',
   port: 3306,
-  username: process.env['DB_USER'],
-  password: process.env['DB_PASS'],
-  database:"gestion_pfe",
+  username: 'amirbnsl',
+  password: 'amir',
+  database: 'gestion_pfe',
   synchronize: true,
-  logging: true,
-  entities: [User, Student, Teacher],
+  logging: false,
+  entities: [User, Student, Teacher, Admin],
   subscribers: [],
   migrations: [],
-})
+  dropSchema: true,
+  seeds: [UserSeeder],
+  factories: [userFactory],
+};
 
+export const AppDataSource = new DataSource(options);

@@ -48,6 +48,13 @@ README.md
     DB_PASSWORD=password
     DB_NAME=gestion_pfe
     ```
+   
+3. create public and private key for jwt token in the root directory
+    ```
+openssl genpkey -algorithm RSA -out private.pem
+openssl rsa -pubout -in private.pem -out public.pem
+
+    ```
 4. Run `npm run dev` to start the development server
 
 ## Rules and Guidelines

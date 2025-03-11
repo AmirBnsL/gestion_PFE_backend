@@ -1,17 +1,35 @@
-import express, { Express, Request, Response } from "express";
-import "reflect-metadata";
-import dotenv from "dotenv";
-import swagger from "swagger-ui-express";
-import swaggerJsdoc from "swagger-jsdoc";
-import morgan from "morgan";
+import express, { Express, Request, Response } from 'express';
+import 'reflect-metadata';
+import swagger from 'swagger-ui-express';
+import swaggerJsdoc from 'swagger-jsdoc';
+import morgan from 'morgan';
 
 import { AppDataSource } from './datasource';
 import userRoutes from './routes/userRoutes';
+import { User, UserRole } from './entities/User';
+import { Admin } from './entities/Admin';
 
 AppDataSource.initialize()
-  .then(() => {
+  .then(async () => {
       // here you can start to work with your database
       console.log("Database is connected")
+    const userRepository = AppDataSource.getRepository(User);
+    const adminRepository = AppDataSource.getRepository(Admin);
+
+    const admin = new Admin();
+    admin.id = 1;
+
+    const user = new User();
+    user.id = 1;
+    user.email = 'amirAdmin@gmail.com';
+    user.firstname = 'amir';
+    user.lastname = 'benslaimi';
+    user.role = UserRole.ADMIN;
+    user.passwordHash = 'Chikouri2**5';
+    user.admin = admin;
+
+    await adminRepository.save(admin);
+    await userRepository.save(user);
   })
   .catch((error) => console.log(error))
 
@@ -22,7 +40,20 @@ const options = {
       title: 'My API',
       version: '1.0.0',
     },
-
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
   apis: ['./src/routes/*.ts'],
 };

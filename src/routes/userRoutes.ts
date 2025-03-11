@@ -1,6 +1,8 @@
 import express from 'express';
 import { createUser, deleteUser, login } from '../controllers/userController';
 import { userLoginSchema, userRegistrationSchema, validateData } from '../middleware/validation';
+import { authorizeRoles, jwtFilter } from '../middleware/authJwt';
+import { UserRole } from '../entities/User';
 /**
  * @swagger
  * tags:
@@ -95,8 +97,24 @@ import { userLoginSchema, userRegistrationSchema, validateData } from '../middle
 const router = express.Router();
 
 
-router.post('/user', validateData(userRegistrationSchema), createUser);
-router.delete('/user', deleteUser);
+router.post('/user',jwtFilter,authorizeRoles([UserRole.ADMIN]) ,validateData(userRegistrationSchema), createUser);
+router.delete('/user',jwtFilter,authorizeRoles([UserRole.ADMIN]), deleteUser);
+
+/**
+ * @swagger
+ *   /api/test-authorization:
+ *     get:
+ *       summary: This is only admin authorized (for testing )
+ *       tags: [User]
+ *       security:
+ *         - bearerAuth: []
+ *       responses:
+ *         200:
+ *           description: You are authorized
+ */
+router.get("/test-authorization",jwtFilter,authorizeRoles([UserRole.ADMIN]),(req,res)=>{
+    res.send("You are authorized")
+});
 router.post('/login', validateData(userLoginSchema), login);
 //router.get("/register", register);
 //router.post("/student",register);

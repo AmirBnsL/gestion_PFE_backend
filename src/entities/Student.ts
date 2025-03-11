@@ -8,7 +8,7 @@ export class Student  {
   id: number;
 
 
-  @OneToOne(() => Student, student => student.user)
+  @OneToOne(() => User, user => user.student)
   @JoinColumn()
   user: User;
 }

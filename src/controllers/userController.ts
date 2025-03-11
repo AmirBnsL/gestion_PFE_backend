@@ -7,6 +7,7 @@ import { EntityNotFoundError, Repository } from 'typeorm';
 
 import { signJwt } from '../middleware/authJwt';
 import { User } from '../entities/User';
+import { tr } from '@faker-js/faker';
 
 
 
@@ -27,12 +28,12 @@ export const createUser = async (req: Request<{}, {}, UserRegistrationInputType>
 
   try {
 
-    const hashedPassword = await hashPassword(req.body.password);
     const user = userRepository.create({
       firstname: req.body.firstname,
       lastname: req.body.lastname,
       email: req.body.email,
-      passwordHash: hashedPassword,
+      passwordHash: req.body.password,
+      role: req.body.role
     });
     await userRepository.save(user);
     res.status(201).send({ data: 'user has been created' });
