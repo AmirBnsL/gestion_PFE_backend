@@ -1,5 +1,6 @@
 /node_modules
 .env
+/.idea
 *.js
 private.key
 public.key

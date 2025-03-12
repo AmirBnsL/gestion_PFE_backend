@@ -3,21 +3,15 @@ import { AppDataSource } from '../datasource';
 import { UserLoginInputType, UserRegistrationInputType } from '../dtos/userDTOs';
 import { ResponseDTO } from '../dtos/genericDTOs';
 import bcrypt from 'bcryptjs';
-import { EntityNotFoundError, Repository } from 'typeorm';
+import { EntityNotFoundError } from 'typeorm';
 
 import { signJwt } from '../middleware/authJwt';
 import { User } from '../entities/User';
-import { tr } from '@faker-js/faker';
 
 
 
 
 
-export const getUser = (req: Request, res: Response) => {
-  const userRepository = AppDataSource.getRepository('User');
-
-
-};
 
 export const createUser = async (req: Request<{}, {}, UserRegistrationInputType>, res: Response<ResponseDTO<string>>) => {
   // Your implementation here
@@ -29,8 +23,6 @@ export const createUser = async (req: Request<{}, {}, UserRegistrationInputType>
   try {
 
     const user = userRepository.create({
-      firstname: req.body.firstname,
-      lastname: req.body.lastname,
       email: req.body.email,
       passwordHash: req.body.password,
       role: req.body.role
@@ -48,24 +40,12 @@ export const deleteUser = (req: Request, res: Response) => {
   res.send('Delete User');
 };
 
-
-const hashPassword = async (password: string) => {
-
-  const salt = await bcrypt.genSalt(10);
-  return await bcrypt.hash(password, salt);
-
-};
-
-
-
-
-
 export const login = async (req: Request<{}, {}, UserLoginInputType>, res: Response<ResponseDTO<string>>) => {
   const userRepository = AppDataSource.getRepository<User>('User');
   try {
     const user = await userRepository.findOneByOrFail({ email: req.body.email });
     if (await bcrypt.compare(req.body.password, user.passwordHash)) {
-
+      debugger
       const token = signJwt(user);
       res.status(200).send({ data: token });
       return;

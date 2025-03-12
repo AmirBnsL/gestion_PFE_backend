@@ -6,7 +6,7 @@ import { Teacher } from './entities/Teacher';
 import { Admin } from './entities/Admin';
 import { SeederOptions } from 'typeorm-extension';
 import { UserSeeder } from './dataloader/seeders';
-import { userFactory } from './dataloader/factories';
+import { adminFactory, studentFactory, teacherFactory, userFactory } from './dataloader/factories';
 const options: DataSourceOptions & SeederOptions = {
   type: 'mysql',
   driver: mysql2,
@@ -22,7 +22,7 @@ const options: DataSourceOptions & SeederOptions = {
   migrations: [],
   dropSchema: true,
   seeds: [UserSeeder],
-  factories: [userFactory],
+  factories: [userFactory,studentFactory,teacherFactory,adminFactory],
 };
 
 export const AppDataSource = new DataSource(options);

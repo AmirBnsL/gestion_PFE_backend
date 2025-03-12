@@ -1,6 +1,6 @@
 import express from 'express';
 import { createUser, deleteUser, login } from '../controllers/userController';
-import { userLoginSchema, userRegistrationSchema, validateData } from '../middleware/validation';
+import { userLoginSchema, userRegistrationSchema, validateBody } from '../middleware/validation';
 import { authorizeRoles, jwtFilter } from '../middleware/authJwt';
 import { UserRole } from '../entities/User';
 /**
@@ -97,7 +97,7 @@ import { UserRole } from '../entities/User';
 const router = express.Router();
 
 
-router.post('/user',jwtFilter,authorizeRoles([UserRole.ADMIN]) ,validateData(userRegistrationSchema), createUser);
+router.post('/user',jwtFilter,authorizeRoles([UserRole.ADMIN]) ,validateBody(userRegistrationSchema), createUser);
 router.delete('/user',jwtFilter,authorizeRoles([UserRole.ADMIN]), deleteUser);
 
 /**
@@ -112,14 +112,10 @@ router.delete('/user',jwtFilter,authorizeRoles([UserRole.ADMIN]), deleteUser);
  *         200:
  *           description: You are authorized
  */
-router.get("/test-authorization",jwtFilter,authorizeRoles([UserRole.ADMIN]),(req,res)=>{
+router.get("/test-authorization",jwtFilter,authorizeRoles([UserRole.ADMIN]),(req:any,res:any)=>{
     res.send("You are authorized")
 });
-router.post('/login', validateData(userLoginSchema), login);
-//router.get("/register", register);
-//router.post("/student",register);
-//router.post("/teacher",register); these are made by the admin
-//admin has already an account and
+router.post('/login', validateBody(userLoginSchema), login);
 
 
 export default router;

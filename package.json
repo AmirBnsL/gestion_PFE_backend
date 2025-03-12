@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "build": "npx tsc",
-    "start": "node dist/index.js",
-    "dev": "nodemon src/index.ts",
+    "start": "node src/index.js",
+    "dev:nodemon" : "nodemon --config nodemon.json src/index.ts",
+    "dev": "ts-node-dev --respawn --watch src src/index.ts",
+    "dev:debug": "ts-node-dev --inspect-brk --respawn --transpile-only --watch src src/index.ts",
     "swagger": "ts-node --env-file=.env src/swagger.ts",
     "db:create": "ts-node ./node_modules/typeorm-extension/bin/cli.mjs db:create",
     "db:drop": "ts-node ./node_modules/typeorm-extension/bin/cli.mjs db:drop",
@@ -47,6 +49,7 @@
     "prettier": "3.5.3",
     "swagger-autogen": "^2.23.7",
     "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.26.0"
   }

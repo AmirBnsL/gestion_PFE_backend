@@ -9,6 +9,8 @@ import userRoutes from './routes/userRoutes';
 import { User, UserRole } from './entities/User';
 import { Admin } from './entities/Admin';
 import { runSeeders } from 'typeorm-extension';
+import bcrypt from 'bcryptjs';
+import adminRoutes from './routes/adminRoutes';
 
 AppDataSource.initialize()
   .then(async () => {
@@ -21,14 +23,15 @@ AppDataSource.initialize()
 
     const admin = new Admin();
     admin.id = 1;
+    admin.firstname='Amir';
+    admin.lastname='Chikouri';
+
 
     const user = new User();
     user.id = 1;
-    user.email = 'amirAdmin@gmail.com';
-    user.firstname = 'amir';
-    user.lastname = 'benslaimi';
+    user.email = 'admin@gmail.com';
     user.role = UserRole.ADMIN;
-    user.passwordHash = 'Chikouri2**5';
+    user.passwordHash = await bcrypt.hash('admin', 8);
     user.admin = admin;
 
     await adminRepository.save(admin);
@@ -36,14 +39,16 @@ AppDataSource.initialize()
   })
   .catch((error) => console.log(error))
 
+// Swagger options for API documentation
 const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'My API',
+      title: 'Gestion PFE API',
       version: '1.0.0',
     },
     components: {
+      // Security schemes for authentication
       securitySchemes: {
         bearerAuth: {
           type: 'http',
@@ -51,15 +56,131 @@ const options = {
           bearerFormat: 'JWT',
         },
       },
+      // Schema definitions for API models
+      schemas: {
+        Student: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'number',
+            },
+            firstname: {
+              type: 'string',
+            },
+            lastname: {
+              type: 'string',
+            },
+            birthdate: {
+              type: 'string',
+              format: 'date',
+            },
+            promotionalYear: {
+              type: 'number',
+            },
+            academicYear: {
+              type: 'string',
+              enum: [
+                '1st preparatory class',
+                '2nd preparatory class',
+                '1st superior class',
+                '2nd superior class',
+                '3rd superior class',
+              ],
+            },
+            group: {
+              type: 'number',
+            },
+            specialty: {
+              type: 'string',
+              enum: [
+                'Informations Systems and Internet',
+                'Information Systems and Web',
+                'Artificial intelligence and Data Sciences',
+              ],
+            },
+            user: {
+              $ref: '#/components/schemas/User',
+            },
+          },
+        },
+        Teacher: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'number',
+            },
+            subject: {
+              type: 'string',
+            },
+            firstname: {
+              type: 'string',
+            },
+            lastname: {
+              type: 'string',
+            },
+            birthdate: {
+              type: 'string',
+              format: 'date',
+            },
+            rank: {
+              type: 'string',
+              enum: ['Assistant', 'Associate', 'Professor'],
+            },
+            role: {
+              type: 'string',
+              enum: ['LECTURER', 'INSTRUCTOR'],
+            },
+            user: {
+              $ref: '#/components/schemas/User',
+            },
+          },
+        },
+        Admin: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'number',
+            },
+          },
+        },
+        User: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'number',
+            },
+            email: {
+              type: 'string',
+            },
+            firstname: {
+              type: 'string',
+            },
+            lastname: {
+              type: 'string',
+            },
+            role: {
+              type: 'string',
+              enum: ['ADMIN', 'USER'],
+            },
+            admin: {
+              $ref: '#/components/schemas/Admin',
+            },
+          },
+        },
+      },
     },
+    // Global security settings
     security: [
       {
         bearerAuth: [],
       },
     ],
   },
+  // Paths to the API routes
   apis: ['./src/routes/*.ts'],
 };
+
+
 const swaggerSpec = swaggerJsdoc(options);
 
 
@@ -71,7 +192,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 const port = process.env.PORT || 3000;
 app.use("/api-docs", swagger.serve, swagger.setup(swaggerSpec));
-app.use("/api/", userRoutes);
+app.use("/api/", [userRoutes,adminRoutes]);
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
