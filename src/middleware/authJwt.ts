@@ -30,7 +30,7 @@ export const signJwt = (user: User) => {
   if (!private_key) {
     throw new Error('PRIVATE_KEY is not set');
   }
-debugger
+  debugger
   console.log(user);
 
   const options: jwt.SignOptions = {
