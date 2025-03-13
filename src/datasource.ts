@@ -11,7 +11,7 @@ const options: DataSourceOptions & SeederOptions = {
   type: 'mysql',
   driver: mysql2,
   host: 'localhost',
-  port: parseInt(process.env.['DB_PORT']) || 3306,
+  port:3306,
   username: process.env['DB_USER'],
   password: process.env['DB_PASS'],
   database: process.env['DB_NAME'],
