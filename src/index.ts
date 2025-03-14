@@ -11,6 +11,7 @@ import { Admin } from './entities/Admin';
 import { runSeeders } from 'typeorm-extension';
 import bcrypt from 'bcryptjs';
 import adminRoutes from './routes/adminRoutes';
+import projectRoutes from './routes/projectRoutes';
 
 AppDataSource.initialize()
   .then(async () => {
@@ -143,6 +144,41 @@ const options = {
             },
           },
         },
+        Project: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'number',
+            },
+            title: {
+              type: 'string',
+            },
+            description: {
+              type: 'string',
+            },
+            status: {
+              type: 'string',
+              enum: ['PROPOSED', 'APPROVED', 'REJECTED'],
+            },
+            startDate: {
+              type: 'string',
+              format: 'date',
+            },
+            endDate: {
+              type: 'string',
+              format: 'date',
+            },
+            students: {
+              type: 'array',
+              items: {
+                $ref: '#/components/schemas/Student',
+              },
+            },
+            supervisor: {
+              $ref: '#/components/schemas/Teacher',
+            },
+          },
+        },
         User: {
           type: 'object',
           properties: {
@@ -192,7 +228,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 const port = process.env.PORT || 3000;
 app.use("/api-docs", swagger.serve, swagger.setup(swaggerSpec));
-app.use("/api/", [userRoutes,adminRoutes]);
+app.use("/api/", [userRoutes,adminRoutes,projectRoutes]);
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
