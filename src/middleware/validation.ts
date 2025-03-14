@@ -25,7 +25,7 @@ export const userRegistrationSchema = z.object({
 export const paginationSchema =
     z.object({
         page: z.coerce.number().int().positive(),
-        limit:z.coerce.number().int().positive()
+        size:z.coerce.number().int().positive()
     });
 
 
@@ -44,6 +44,7 @@ export const userLoginSchema = z.object({
 export function validateBody(schema: z.ZodObject<any, any>) {
     return (req: Request, res: Response, next: NextFunction) => {
         try {
+            debugger
             schema.parse(req.body);
             next();
         } catch (error) {
