@@ -5,6 +5,8 @@ import { Admin } from '../entities/Admin';
 import { AcademicYear, Specialty, Student } from '../entities/Student';
 import { rank, Teacher, TeacherRole } from '../entities/Teacher';
 import adminRoutes from '../routes/adminRoutes';
+import { Project, ProjectStatus } from '../entities/Project';
+import { ProjectSeeder } from './seeders';
 
 export const userFactory = setSeederFactory(User, () => {
   const user = new User();
@@ -51,3 +53,22 @@ export const teacherFactory = setSeederFactory(Teacher, () => {
   teacher.role = faker.helpers.arrayElement([TeacherRole.INSTRUCTOR, TeacherRole.LECTURER]);
   return teacher;
 });
+
+export const projectFactory = setSeederFactory(Project, () => {
+  const project = new Project();
+  project.title = faker.lorem.words(3);
+  project.description = faker.lorem.sentence();
+  project.startDate = faker.date.past();
+  project.endDate = faker.date.future();
+  project.specialty = faker.helpers.arrayElement([
+    Specialty.AIDS, Specialty.ISI, Specialty.SIW
+  ]);
+  project.status = faker.helpers.arrayElement([
+      ProjectStatus.APPROVED,ProjectStatus.PROPOSED,ProjectStatus.COMPLETED,ProjectStatus.REJECTED,ProjectStatus.IN_PROGRESS,ProjectStatus.CANCELLED
+  ]);
+  project.groupId = faker.number.int({ min: 1, max: 10 });
+  project.createdAt = faker.date.past();
+  project.updatedAt = faker.date.recent();
+  project.rejectionReason = faker.lorem.sentence();
+  return project;
+})

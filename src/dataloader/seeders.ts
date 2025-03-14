@@ -4,6 +4,7 @@ import { User, UserRole } from '../entities/User';
 import { Admin } from '../entities/Admin';
 import { Student } from '../entities/Student';
 import { Teacher } from '../entities/Teacher';
+import { Project } from '../entities/Project';
 
 export class UserSeeder implements Seeder {
   public async run(dataSource: DataSource, factoryManager: SeederFactoryManager): Promise<any> {
@@ -29,3 +30,22 @@ export class UserSeeder implements Seeder {
     }
   }
 }
+
+export class ProjectSeeder implements Seeder {
+  public async run(dataSource: DataSource, factoryManager: SeederFactoryManager): Promise<any> {
+    const teacherRepository = dataSource.getRepository(Teacher);
+    const projectRepository = dataSource.getRepository(Project);
+    const projectFactory = factoryManager.get(Project);
+
+    const teachers = await teacherRepository.find();
+    for (const teacher of teachers) {
+      const projects = await projectFactory.saveMany(3);
+      for (const project of projects) {
+        project.proposedBy = teacher;
+      }
+      await projectRepository.save(projects);
+    }
+  }
+}
+
+

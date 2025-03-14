@@ -5,8 +5,8 @@ import { Student } from './entities/Student';
 import { Teacher } from './entities/Teacher';
 import { Admin } from './entities/Admin';
 import { SeederOptions } from 'typeorm-extension';
-import { UserSeeder } from './dataloader/seeders';
-import { adminFactory, studentFactory, teacherFactory, userFactory } from './dataloader/factories';
+import { ProjectSeeder, UserSeeder } from './dataloader/seeders';
+import { adminFactory, projectFactory, studentFactory, teacherFactory, userFactory } from './dataloader/factories';
 import { Announcements } from './entities/Announcements';
 import { Project } from './entities/Project';
 const options: DataSourceOptions & SeederOptions = {
@@ -23,8 +23,8 @@ const options: DataSourceOptions & SeederOptions = {
   subscribers: [],
   migrations: [],
   dropSchema: true,
-  seeds: [UserSeeder],
-  factories: [userFactory,studentFactory,teacherFactory,adminFactory],
+  seeds: [UserSeeder,ProjectSeeder],
+  factories: [userFactory,studentFactory,teacherFactory,adminFactory,projectFactory],
 };
 
 export const AppDataSource = new DataSource(options);
