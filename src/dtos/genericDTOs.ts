@@ -15,3 +15,4 @@ export interface PageQuery extends ParsedQs{
   page:string
   size:string
 }
+

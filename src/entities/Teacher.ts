@@ -1,5 +1,6 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './User';
+import { Project } from './Project';
 
 export enum rank {
   Assistant = 'Assistant',
@@ -46,4 +47,7 @@ export class Teacher {
   @OneToOne(() => User)
   @JoinColumn()
   user: User;
+
+  @OneToMany(() => Project, project => project.proposedBy)
+  proposedProjects: Project;
 }

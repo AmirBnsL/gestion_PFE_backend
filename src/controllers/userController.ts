@@ -36,9 +36,7 @@ export const createUser = async (req: Request<{}, {}, UserRegistrationInputType>
 
 
 };
-export const deleteUser = (req: Request, res: Response) => {
-  res.send('Delete User');
-};
+
 
 export const login = async (req: Request<{}, {}, UserLoginInputType>, res: Response<ResponseDTO<string>>) => {
   const userRepository = AppDataSource.getRepository<User>('User');

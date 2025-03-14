@@ -1,8 +1,9 @@
 import express from 'express';
-import { createUser, deleteUser, login } from '../controllers/userController';
+import { createUser, login } from '../controllers/userController';
 import { userLoginSchema, userRegistrationSchema, validateBody } from '../middleware/validation';
 import { authorizeRoles, jwtFilter } from '../middleware/authJwt';
 import { UserRole } from '../entities/User';
+import {deleteUser} from '../controllers/adminController';
 /**
  * @swagger
  * tags:
