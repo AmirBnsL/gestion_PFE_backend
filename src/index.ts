@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import swagger from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import morgan from 'morgan';
-
+import helmet from 'helmet';
 import { AppDataSource } from './datasource';
 import userRoutes from './routes/userRoutes';
 import { User, UserRole } from './entities/User';
@@ -12,6 +12,9 @@ import { runSeeders } from 'typeorm-extension';
 import bcrypt from 'bcryptjs';
 import adminRoutes from './routes/adminRoutes';
 import projectRoutes from './routes/projectRoutes';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import announcementsRoutes from './routes/announcementsRoutes';
 
 AppDataSource.initialize()
   .then(async () => {
@@ -144,6 +147,36 @@ const options = {
             },
           },
         },
+        Announcement: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'number',
+            },
+            title: {
+              type: 'string',
+            },
+            body: {
+              type: 'string',
+            },
+            audience: {
+              type: 'string',
+              enum: ['STUDENTS', 'TEACHERS', 'ALL'],
+            },
+            priority: {
+              type: 'string',
+              enum: ['LOW', 'MEDIUM', 'HIGH'],
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+          },
+        },
         Project: {
           type: 'object',
           properties: {
@@ -224,18 +257,25 @@ const swaggerSpec = swaggerJsdoc(options);
 
 const app: Express = express();
 
+const server = createServer(app);
+
+
+export const io = new Server(server);
+
 app.use(express.json());
 app.use(morgan("dev"));
+
 const port = process.env.PORT || 3000;
 app.use("/api-docs", swagger.serve, swagger.setup(swaggerSpec));
-app.use("/api/", [userRoutes,adminRoutes,projectRoutes]);
+app.use("/api/", [userRoutes,adminRoutes,projectRoutes,announcementsRoutes]);
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
+})
 
-});
+
 
 //TODO : Authorization, Authentication ,CRUD of users,One to one relation ship with users

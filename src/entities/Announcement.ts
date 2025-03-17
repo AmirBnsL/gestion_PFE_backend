@@ -13,7 +13,7 @@ export enum Priority {
 }
 
 @Entity('announcements')
-export class Announcements {
+export class Announcement {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -27,13 +27,13 @@ export class Announcements {
     type: 'enum',
     enum: Audience,
   })
-  Audience : Audience[];
+  audience : Audience;
 
   @Column({
     type: 'enum',
     enum: Priority,
   })
-  Priority:Priority;
+  priority:Priority;
 }
 
 //TODO:websockets for announcements

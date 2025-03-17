@@ -7,7 +7,7 @@ import { Admin } from './entities/Admin';
 import { SeederOptions } from 'typeorm-extension';
 import { ProjectSeeder, UserSeeder } from './dataloader/seeders';
 import { adminFactory, projectFactory, studentFactory, teacherFactory, userFactory } from './dataloader/factories';
-import { Announcements } from './entities/Announcements';
+import { Announcement } from './entities/Announcement';
 import { Project } from './entities/Project';
 const options: DataSourceOptions & SeederOptions = {
   type: 'mysql',
@@ -19,7 +19,7 @@ const options: DataSourceOptions & SeederOptions = {
   database: process.env['DB_NAME'],
   synchronize: true,
   logging: false,
-  entities: [User, Student, Teacher, Admin,Announcements,Project],
+  entities: [User, Student, Teacher, Admin,Announcement,Project],
   subscribers: [],
   migrations: [],
   dropSchema: true,
