@@ -148,6 +148,12 @@ const options = {
             id: {
               type: 'number',
             },
+            firstname: {
+              type: 'string',
+            },
+            lastname: {
+              type: 'string',
+            },
           },
         },
         Announcement: {
