@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import swagger from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import morgan from 'morgan';
-import helmet from 'helmet';
+
 import { AppDataSource } from './datasource';
 import userRoutes from './routes/userRoutes';
 import { User, UserRole } from './entities/User';
@@ -233,9 +233,6 @@ const options = {
             role: {
               type: 'string',
               enum: [UserRole.STUDENT,UserRole.TEACHER ,UserRole.ADMIN],
-            },
-            admin: {
-              $ref: '#/components/schemas/Admin',
             },
           },
         },
