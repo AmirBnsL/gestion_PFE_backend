@@ -15,6 +15,9 @@ import projectRoutes from './routes/projectRoutes';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import announcementsRoutes from './routes/announcementsRoutes';
+import { Audience, Priority } from './entities/Announcement';
+import { ProjectStatus } from './entities/Project';
+import { Rank, TeacherRole } from './entities/Teacher';
 
 AppDataSource.initialize()
   .then(async () => {
@@ -128,11 +131,11 @@ const options = {
             },
             rank: {
               type: 'string',
-              enum: ['Assistant', 'Associate', 'Professor'],
+              enum: [Rank.Professor,Rank.Associate,Rank.Assistant],
             },
             role: {
               type: 'string',
-              enum: ['LECTURER', 'INSTRUCTOR'],
+              enum: [TeacherRole.LECTURER,TeacherRole.INSTRUCTOR],
             },
             user: {
               $ref: '#/components/schemas/User',
@@ -161,11 +164,11 @@ const options = {
             },
             audience: {
               type: 'string',
-              enum: ['STUDENTS', 'TEACHERS', 'ALL'],
+              enum: [Audience.ALL,Audience.STUDENTS,Audience.TEACHERS],
             },
             priority: {
               type: 'string',
-              enum: ['LOW', 'MEDIUM', 'HIGH'],
+              enum: [Priority.LOW,Priority.MEDIUM,Priority.HIGH],
             },
             createdAt: {
               type: 'string',
@@ -191,7 +194,7 @@ const options = {
             },
             status: {
               type: 'string',
-              enum: ['PROPOSED', 'APPROVED', 'REJECTED'],
+              enum: [ProjectStatus.CANCELLED,ProjectStatus.IN_PROGRESS,ProjectStatus.PROPOSED,ProjectStatus.APPROVED,ProjectStatus.COMPLETED,ProjectStatus.REJECTED],
             },
             startDate: {
               type: 'string',
@@ -229,7 +232,7 @@ const options = {
             },
             role: {
               type: 'string',
-              enum: ['ADMIN', 'USER'],
+              enum: [UserRole.STUDENT,UserRole.TEACHER ,UserRole.ADMIN],
             },
             admin: {
               $ref: '#/components/schemas/Admin',

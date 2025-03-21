@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn
 import { User } from './User';
 import { Project } from './Project';
 
-export enum rank {
+export enum Rank {
   Assistant = 'Assistant',
   Associate = 'Associate',
   Professor = 'Professor'
@@ -33,9 +33,9 @@ export class Teacher {
 
   @Column({
     type: 'enum',
-    enum: rank,
+    enum: Rank,
   })
-  rank: rank;
+  rank: Rank;
 
   @Column({
     type: 'enum',

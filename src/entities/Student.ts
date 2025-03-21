@@ -44,7 +44,7 @@ export class Student {
 
   @Column()
   group: number;
-
+  
 
   @Column({
     type: 'enum',

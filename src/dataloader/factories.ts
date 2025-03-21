@@ -3,10 +3,9 @@ import { setSeederFactory } from 'typeorm-extension';
 import { faker } from '@faker-js/faker';
 import { Admin } from '../entities/Admin';
 import { AcademicYear, Specialty, Student } from '../entities/Student';
-import { rank, Teacher, TeacherRole } from '../entities/Teacher';
-import adminRoutes from '../routes/adminRoutes';
+import { Rank, Teacher, TeacherRole } from '../entities/Teacher';
 import { Project, ProjectStatus } from '../entities/Project';
-import { ProjectSeeder } from './seeders';
+
 
 export const userFactory = setSeederFactory(User, () => {
   const user = new User();
@@ -49,7 +48,7 @@ export const teacherFactory = setSeederFactory(Teacher, () => {
   teacher.lastname = faker.person.lastName();
   teacher.birthdate = faker.date.birthdate();
   teacher.subject = faker.helpers.arrayElement(['Analyse', 'Systems', 'Architecture', 'Algebra']);
-  teacher.rank = faker.helpers.arrayElement([rank.Assistant, rank.Associate, rank.Professor]);
+  teacher.rank = faker.helpers.arrayElement([Rank.Assistant, Rank.Associate, Rank.Professor]);
   teacher.role = faker.helpers.arrayElement([TeacherRole.INSTRUCTOR, TeacherRole.LECTURER]);
   return teacher;
 });
