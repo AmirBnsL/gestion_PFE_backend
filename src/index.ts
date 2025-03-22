@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import swagger from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import morgan from 'morgan';
-
+import cors from 'cors'
 import { AppDataSource } from './datasource';
 import userRoutes from './routes/userRoutes';
 import { User, UserRole } from './entities/User';
@@ -270,8 +270,9 @@ export const io = new Server(server);
 
 app.use(express.json());
 app.use(morgan("dev"));
+app.use(cors())
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 app.use("/api-docs", swagger.serve, swagger.setup(swaggerSpec));
 app.use("/api/", [userRoutes,adminRoutes,projectRoutes,announcementsRoutes]);
 app.get("/", (req: Request, res: Response) => {

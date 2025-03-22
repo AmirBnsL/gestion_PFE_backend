@@ -43,6 +43,7 @@ export const createUser = async (req: Request<{}, {}, UserRegistrationInputType>
 
 export const login = async (req: Request<{}, {}, UserLoginInputType>, res: Response<ResponseDTO<string>>) => {
   const userRepository = AppDataSource.getRepository<User>('User');
+  debugger
   try {
     const user = await userRepository.findOneByOrFail({ email: req.body.email });
     if (await bcrypt.compare(req.body.password, user.passwordHash)) {
