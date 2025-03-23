@@ -1,9 +1,14 @@
-import { Column, Entity, PrimaryGeneratedColumn, OneToOne, BeforeInsert } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  BeforeInsert,
+} from 'typeorm';
 import { Student } from './Student';
 import { Teacher } from './Teacher';
 import { Admin } from './Admin';
 import bcrypt from 'bcryptjs';
-
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -14,15 +19,14 @@ export enum UserRole {
 @Entity('user')
 export class User {
   @PrimaryGeneratedColumn()
-  id: number
-
+  id: number;
 
   @Column()
   email: string;
 
   @Column({
     type: 'enum',
-    enum: UserRole
+    enum: UserRole,
   })
   role: UserRole;
 
@@ -38,13 +42,9 @@ export class User {
   @OneToOne(() => Admin, admin => admin.user)
   admin: Admin;
 
-
-
-
   @BeforeInsert()
   hashPassword() {
     // Hash the password before inserting it into the database
     this.passwordHash = bcrypt.hashSync(this.passwordHash, 8);
   }
-
 }

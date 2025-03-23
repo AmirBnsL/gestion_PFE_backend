@@ -1,7 +1,12 @@
-import { BeforeInsert, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Specialty } from './Student';
 import { Teacher } from './Teacher';
-
 
 export enum ProjectStatus {
   PROPOSED = 'proposed',
@@ -9,16 +14,15 @@ export enum ProjectStatus {
   REJECTED = 'rejected',
   IN_PROGRESS = 'in_progress',
   COMPLETED = 'completed',
-  CANCELLED = 'cancelled'
+  CANCELLED = 'cancelled',
 }
 
 @Entity('project')
 export class Project {
-
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({nullable: false})
+  @Column({ nullable: false })
   title: string;
 
   @Column()
@@ -56,7 +60,6 @@ export class Project {
 
   @Column()
   rejectionReason: string;
-
 
   @BeforeInsert()
   setDates() {

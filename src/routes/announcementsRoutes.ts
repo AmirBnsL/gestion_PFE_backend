@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import { authorizeRoles, jwtFilter } from '../middleware/authJwt';
 import { UserRole } from '../entities/User';
-import { getAnnouncments, publishAnnouncement } from '../controllers/announcementsController';
-
+import {
+  getAnnouncments,
+  publishAnnouncement,
+} from '../controllers/announcementsController';
 
 const router = Router();
 
@@ -46,11 +48,12 @@ const router = Router();
  *         description: Internal server error
  */
 
-
-router.post("/announcement",jwtFilter,authorizeRoles([UserRole.ADMIN]),publishAnnouncement);
-
-
-
+router.post(
+  '/announcement',
+  jwtFilter,
+  authorizeRoles([UserRole.ADMIN]),
+  publishAnnouncement,
+);
 
 /**
  * @swagger
@@ -90,5 +93,10 @@ router.post("/announcement",jwtFilter,authorizeRoles([UserRole.ADMIN]),publishAn
  *         description: Internal server error
  */
 
-router.get("/announcements",jwtFilter,authorizeRoles([UserRole.ADMIN,UserRole.STUDENT,UserRole.TEACHER]),getAnnouncments);
+router.get(
+  '/announcements',
+  jwtFilter,
+  authorizeRoles([UserRole.ADMIN, UserRole.STUDENT, UserRole.TEACHER]),
+  getAnnouncments,
+);
 export default router;

@@ -1,9 +1,13 @@
 import express from 'express';
-import { createUser, login } from '../controllers/userController';
-import { userLoginSchema, userRegistrationSchema, validateBody } from '../middleware/validation';
+import { createUser, getProfile, login } from '../controllers/userController';
+import {
+  userLoginSchema,
+  userRegistrationSchema,
+  validateBody,
+} from '../middleware/validation';
 import { authorizeRoles, jwtFilter } from '../middleware/authJwt';
 import { UserRole } from '../entities/User';
-import {deleteUser} from '../controllers/adminController';
+import { deleteUser } from '../controllers/adminController';
 /**
  * @swagger
  * tags:
@@ -93,13 +97,16 @@ import {deleteUser} from '../controllers/adminController';
  *         description: Bad request
  */
 
-
-
 const router = express.Router();
 
-
-router.post('/user',jwtFilter,authorizeRoles([UserRole.ADMIN]) ,validateBody(userRegistrationSchema), createUser);
-router.delete('/user',jwtFilter,authorizeRoles([UserRole.ADMIN]), deleteUser);
+router.post(
+  '/user',
+  jwtFilter,
+  authorizeRoles([UserRole.ADMIN]),
+  validateBody(userRegistrationSchema),
+  createUser,
+);
+router.delete('/user', jwtFilter, authorizeRoles([UserRole.ADMIN]), deleteUser);
 
 /**
  * @swagger
@@ -113,10 +120,41 @@ router.delete('/user',jwtFilter,authorizeRoles([UserRole.ADMIN]), deleteUser);
  *         200:
  *           description: You are authorized
  */
-router.get("/test-authorization",jwtFilter,authorizeRoles([UserRole.ADMIN]),(req:any,res:any)=>{
-    res.send("You are authorized")
-});
+router.get(
+  '/test-authorization',
+  jwtFilter,
+  authorizeRoles([UserRole.ADMIN]),
+  (req: any, res: any) => {
+    res.send('You are authorized');
+  },
+);
 router.post('/login', validateBody(userLoginSchema), login);
 
+/**
+ * @swagger
+ * /api/profile:
+ *   get:
+ *     summary: Get the profile of the logged-in user
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile retrieved successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden by role
+ *       500:
+ *         description: Internal server error
+ */
+
+// @ts-ignore
+router.get(
+  '/profile',
+  jwtFilter,
+  authorizeRoles([UserRole.STUDENT, UserRole.TEACHER, UserRole.ADMIN]),
+  getProfile,
+);
 
 export default router;

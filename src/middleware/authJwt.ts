@@ -1,13 +1,12 @@
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { User } from '../entities/User';
 import { StatusCodes } from 'http-status-codes';
 import * as fs from 'node:fs';
-
-
+import { Request } from 'express';
+import { IncomingHttpHeaders } from 'node:http2';
 
 const private_key = fs.readFileSync('private.pem', 'utf8');
 const public_key = fs.readFileSync('public.pem', 'utf8');
-
 
 interface jwtPayload {
   sub: string;
@@ -15,20 +14,17 @@ interface jwtPayload {
   iat: number;
 }
 
-interface JwtRequestHeader extends Headers {
-  authorization: string;
-
+interface JwtRequestHeader extends IncomingHttpHeaders {
+  authorization?: string;
 }
 
-interface JwtRequest extends Request {
+export interface JwtRequest extends Request {
   user: jwtPayload;
   headers: JwtRequestHeader;
 }
 
-
 export const signJwt = (user: User) => {
-
-  debugger
+  debugger;
   console.log(user);
 
   const options: jwt.SignOptions = {
@@ -37,7 +33,7 @@ export const signJwt = (user: User) => {
   };
 
   const payload: jwtPayload = {
-    sub: user.id.toString(),
+    sub: user.email,
     role: user.role,
     iat: Math.floor(Date.now() / 1000), // Use seconds since epoch
   };
@@ -51,7 +47,6 @@ const verifyJwt = (token: string) => {
   }
   return jwt.verify(token, public_key) as jwtPayload;
 };
-
 
 export const jwtFilter = (req: JwtRequest, res: any, next: any) => {
   const token = req.headers.authorization;
@@ -68,7 +63,6 @@ export const jwtFilter = (req: JwtRequest, res: any, next: any) => {
     return res.status(401).send({ data: error });
   }
 };
-
 
 export const authorizeRoles = (role: string[]) => {
   return (req: JwtRequest, res: any, next: any) => {

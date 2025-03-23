@@ -1,11 +1,18 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { User } from './User';
 import { Project } from './Project';
 
 export enum Rank {
   Assistant = 'Assistant',
   Associate = 'Associate',
-  Professor = 'Professor'
+  Professor = 'Professor',
 }
 
 export enum TeacherRole {
@@ -27,9 +34,8 @@ export class Teacher {
   @Column()
   lastname: string;
 
-
   @Column()
-  birthdate:Date;
+  birthdate: Date;
 
   @Column({
     type: 'enum',
@@ -42,7 +48,6 @@ export class Teacher {
     enum: TeacherRole,
   })
   role: TeacherRole;
-
 
   @OneToOne(() => User)
   @JoinColumn()

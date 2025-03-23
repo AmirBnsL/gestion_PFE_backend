@@ -2,13 +2,9 @@ import express from 'express';
 import { authorizeRoles, jwtFilter } from '../middleware/authJwt';
 import { UserRole } from '../entities/User';
 import { paginationSchema, validateQuery } from '../middleware/validation';
-import {
-  getStudents,
-  getTeachers,
-} from '../controllers/adminController';
+import { getStudents, getTeachers } from '../controllers/adminController';
 
 const router = express.Router();
-
 
 /**
  * @swagger
@@ -52,8 +48,13 @@ const router = express.Router();
  *       500:
  *         description: Internal server error
  */
-router.get('/teachers', jwtFilter, authorizeRoles([UserRole.ADMIN]), validateQuery(paginationSchema), getTeachers);
-
+router.get(
+  '/teachers',
+  jwtFilter,
+  authorizeRoles([UserRole.ADMIN]),
+  validateQuery(paginationSchema),
+  getTeachers,
+);
 
 /**
  * @swagger
@@ -98,6 +99,12 @@ router.get('/teachers', jwtFilter, authorizeRoles([UserRole.ADMIN]), validateQue
  *         description: Internal server error
  */
 
-router.get('/students', jwtFilter, authorizeRoles([UserRole.ADMIN]), validateQuery(paginationSchema), getStudents);
+router.get(
+  '/students',
+  jwtFilter,
+  authorizeRoles([UserRole.ADMIN]),
+  validateQuery(paginationSchema),
+  getStudents,
+);
 
 export default router;

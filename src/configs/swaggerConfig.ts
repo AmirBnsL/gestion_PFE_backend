@@ -3,7 +3,6 @@ import { Audience, Priority } from '../entities/Announcement';
 import { ProjectStatus } from '../entities/Project';
 import { UserRole } from '../entities/User';
 
-
 export const options = {
   definition: {
     openapi: '3.0.0',
@@ -88,11 +87,11 @@ export const options = {
             },
             rank: {
               type: 'string',
-              enum: [Rank.Professor,Rank.Associate,Rank.Assistant],
+              enum: [Rank.Professor, Rank.Associate, Rank.Assistant],
             },
             role: {
               type: 'string',
-              enum: [TeacherRole.LECTURER,TeacherRole.INSTRUCTOR],
+              enum: [TeacherRole.LECTURER, TeacherRole.INSTRUCTOR],
             },
             user: {
               $ref: '#/components/schemas/User',
@@ -127,11 +126,11 @@ export const options = {
             },
             audience: {
               type: 'string',
-              enum: [Audience.ALL,Audience.STUDENTS,Audience.TEACHERS],
+              enum: [Audience.ALL, Audience.STUDENTS, Audience.TEACHERS],
             },
             priority: {
               type: 'string',
-              enum: [Priority.LOW,Priority.MEDIUM,Priority.HIGH],
+              enum: [Priority.LOW, Priority.MEDIUM, Priority.HIGH],
             },
             createdAt: {
               type: 'string',
@@ -157,7 +156,14 @@ export const options = {
             },
             status: {
               type: 'string',
-              enum: [ProjectStatus.CANCELLED,ProjectStatus.IN_PROGRESS,ProjectStatus.PROPOSED,ProjectStatus.APPROVED,ProjectStatus.COMPLETED,ProjectStatus.REJECTED],
+              enum: [
+                ProjectStatus.CANCELLED,
+                ProjectStatus.IN_PROGRESS,
+                ProjectStatus.PROPOSED,
+                ProjectStatus.APPROVED,
+                ProjectStatus.COMPLETED,
+                ProjectStatus.REJECTED,
+              ],
             },
             startDate: {
               type: 'string',
@@ -195,7 +201,7 @@ export const options = {
             },
             role: {
               type: 'string',
-              enum: [UserRole.STUDENT,UserRole.TEACHER ,UserRole.ADMIN],
+              enum: [UserRole.STUDENT, UserRole.TEACHER, UserRole.ADMIN],
             },
           },
         },

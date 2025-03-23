@@ -6,7 +6,6 @@ import { AcademicYear, Specialty, Student } from '../entities/Student';
 import { Rank, Teacher, TeacherRole } from '../entities/Teacher';
 import { Project, ProjectStatus } from '../entities/Project';
 
-
 export const userFactory = setSeederFactory(User, () => {
   const user = new User();
   user.email = faker.internet.email();
@@ -33,11 +32,13 @@ export const studentFactory = setSeederFactory(Student, () => {
     AcademicYear.SECOND,
     AcademicYear.THIRD,
     AcademicYear.SECOND,
-    AcademicYear.FIFTH
+    AcademicYear.FIFTH,
   ]);
   student.group = faker.number.int({ min: 1, max: 10 });
   student.specialty = faker.helpers.arrayElement([
-    Specialty.AIDS, Specialty.ISI, Specialty.SIW
+    Specialty.AIDS,
+    Specialty.ISI,
+    Specialty.SIW,
   ]);
   return student;
 });
@@ -47,9 +48,21 @@ export const teacherFactory = setSeederFactory(Teacher, () => {
   teacher.firstname = faker.person.firstName();
   teacher.lastname = faker.person.lastName();
   teacher.birthdate = faker.date.birthdate();
-  teacher.subject = faker.helpers.arrayElement(['Analyse', 'Systems', 'Architecture', 'Algebra']);
-  teacher.rank = faker.helpers.arrayElement([Rank.Assistant, Rank.Associate, Rank.Professor]);
-  teacher.role = faker.helpers.arrayElement([TeacherRole.INSTRUCTOR, TeacherRole.LECTURER]);
+  teacher.subject = faker.helpers.arrayElement([
+    'Analyse',
+    'Systems',
+    'Architecture',
+    'Algebra',
+  ]);
+  teacher.rank = faker.helpers.arrayElement([
+    Rank.Assistant,
+    Rank.Associate,
+    Rank.Professor,
+  ]);
+  teacher.role = faker.helpers.arrayElement([
+    TeacherRole.INSTRUCTOR,
+    TeacherRole.LECTURER,
+  ]);
   return teacher;
 });
 
@@ -60,14 +73,21 @@ export const projectFactory = setSeederFactory(Project, () => {
   project.startDate = faker.date.past();
   project.endDate = faker.date.future();
   project.specialty = faker.helpers.arrayElement([
-    Specialty.AIDS, Specialty.ISI, Specialty.SIW
+    Specialty.AIDS,
+    Specialty.ISI,
+    Specialty.SIW,
   ]);
   project.status = faker.helpers.arrayElement([
-      ProjectStatus.APPROVED,ProjectStatus.PROPOSED,ProjectStatus.COMPLETED,ProjectStatus.REJECTED,ProjectStatus.IN_PROGRESS,ProjectStatus.CANCELLED
+    ProjectStatus.APPROVED,
+    ProjectStatus.PROPOSED,
+    ProjectStatus.COMPLETED,
+    ProjectStatus.REJECTED,
+    ProjectStatus.IN_PROGRESS,
+    ProjectStatus.CANCELLED,
   ]);
   project.groupId = faker.number.int({ min: 1, max: 10 });
   project.createdAt = faker.date.past();
   project.updatedAt = faker.date.recent();
   project.rejectionReason = faker.lorem.sentence();
   return project;
-})
+});

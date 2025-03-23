@@ -1,5 +1,11 @@
 import { User } from './User';
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 export enum StudentStatus {
   ACTIVE = 'ACTIVE',
@@ -20,7 +26,6 @@ export enum AcademicYear {
   FOURTH = '2nd superior class',
   FIFTH = '3rd superior class',
 }
-
 
 @Entity('student')
 export class Student {
@@ -44,14 +49,12 @@ export class Student {
 
   @Column()
   group: number;
-  
 
   @Column({
     type: 'enum',
     enum: Specialty,
   })
   specialty: Specialty;
-
 
   @OneToOne(() => User, user => user.student)
   @JoinColumn()

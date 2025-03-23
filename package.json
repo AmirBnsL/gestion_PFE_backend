@@ -4,6 +4,7 @@
   "description": "backend for PFE management app",
   "main": "index.js",
   "scripts": {
+    "format": "prettier --write \"src/**/*.{js,ts,tsx,json,css,md}\"",
     "clean": "find ./src -name \"*.js\" -type f -delete",
     "build": "npx tsc",
     "start": "concurrently \"npx tsc --watch\" \"nodemon\"",

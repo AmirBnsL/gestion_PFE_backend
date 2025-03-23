@@ -1,10 +1,17 @@
 import { Router } from 'express';
 import { authorizeRoles, jwtFilter } from '../middleware/authJwt';
 import { UserRole } from '../entities/User';
-import { getApprovedProjects, getProjectOverview } from '../controllers/projectController';
+import {
+  getApprovedProjects,
+  getProjectOverview,
+} from '../controllers/projectController';
 import { paginationSchema, validateQuery } from '../middleware/validation';
-import { approveProject, getPendingApprovalProjects, getProjects, rejectProject } from '../controllers/adminController';
-
+import {
+  approveProject,
+  getPendingApprovalProjects,
+  getProjects,
+  rejectProject,
+} from '../controllers/adminController';
 
 const router = Router();
 /**
@@ -35,7 +42,12 @@ const router = Router();
  *         description: Internal server error
  */
 
-router.get("/projects/approved",jwtFilter,authorizeRoles([UserRole.ADMIN,UserRole.TEACHER,UserRole.STUDENT]),getApprovedProjects);
+router.get(
+  '/projects/approved',
+  jwtFilter,
+  authorizeRoles([UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT]),
+  getApprovedProjects,
+);
 
 /**
  * @swagger
@@ -72,10 +84,12 @@ router.get("/projects/approved",jwtFilter,authorizeRoles([UserRole.ADMIN,UserRol
  *         description: Internal server error
  */
 
-router.get("/project/overview/:id",jwtFilter,authorizeRoles([UserRole.ADMIN,UserRole.TEACHER,UserRole.STUDENT]),getProjectOverview);
-
-
-
+router.get(
+  '/project/overview/:id',
+  jwtFilter,
+  authorizeRoles([UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT]),
+  getProjectOverview,
+);
 
 /**
  * @swagger
@@ -120,8 +134,13 @@ router.get("/project/overview/:id",jwtFilter,authorizeRoles([UserRole.ADMIN,User
  *         description: Internal server error
  */
 
-
-router.get('/projects', jwtFilter, authorizeRoles([UserRole.ADMIN]), validateQuery(paginationSchema), getProjects);
+router.get(
+  '/projects',
+  jwtFilter,
+  authorizeRoles([UserRole.ADMIN]),
+  validateQuery(paginationSchema),
+  getProjects,
+);
 
 /**
  * @swagger
@@ -166,8 +185,13 @@ router.get('/projects', jwtFilter, authorizeRoles([UserRole.ADMIN]), validateQue
  *         description: Internal server error
  */
 
-
-router.get('/projects/pending', jwtFilter, authorizeRoles([UserRole.ADMIN]), validateQuery(paginationSchema), getPendingApprovalProjects);
+router.get(
+  '/projects/pending',
+  jwtFilter,
+  authorizeRoles([UserRole.ADMIN]),
+  validateQuery(paginationSchema),
+  getPendingApprovalProjects,
+);
 
 /**
  * @swagger
@@ -197,7 +221,12 @@ router.get('/projects/pending', jwtFilter, authorizeRoles([UserRole.ADMIN]), val
  *         description: Internal server error
  */
 
-router.post('/project/approve/:id', jwtFilter, authorizeRoles([UserRole.ADMIN]), approveProject);
+router.post(
+  '/project/approve/:id',
+  jwtFilter,
+  authorizeRoles([UserRole.ADMIN]),
+  approveProject,
+);
 
 /**
  * @swagger
@@ -226,9 +255,11 @@ router.post('/project/approve/:id', jwtFilter, authorizeRoles([UserRole.ADMIN]),
  *       500:
  *         description: Internal server error
  */
-router.post('/project/reject/:id', jwtFilter, authorizeRoles([UserRole.ADMIN]),rejectProject);
-
-
-
+router.post(
+  '/project/reject/:id',
+  jwtFilter,
+  authorizeRoles([UserRole.ADMIN]),
+  rejectProject,
+);
 
 export default router;

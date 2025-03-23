@@ -7,7 +7,10 @@ import { Teacher } from '../entities/Teacher';
 import { Project } from '../entities/Project';
 
 export class UserSeeder implements Seeder {
-  public async run(dataSource: DataSource, factoryManager: SeederFactoryManager): Promise<any> {
+  public async run(
+    dataSource: DataSource,
+    factoryManager: SeederFactoryManager,
+  ): Promise<any> {
     const userFactory = factoryManager.get(User);
     const adminFactory = factoryManager.get(Admin);
     const studentFactory = factoryManager.get(Student);
@@ -32,7 +35,10 @@ export class UserSeeder implements Seeder {
 }
 
 export class ProjectSeeder implements Seeder {
-  public async run(dataSource: DataSource, factoryManager: SeederFactoryManager): Promise<any> {
+  public async run(
+    dataSource: DataSource,
+    factoryManager: SeederFactoryManager,
+  ): Promise<any> {
     const teacherRepository = dataSource.getRepository(Teacher);
     const projectRepository = dataSource.getRepository(Project);
     const projectFactory = factoryManager.get(Project);
@@ -47,5 +53,3 @@ export class ProjectSeeder implements Seeder {
     }
   }
 }
-
-
