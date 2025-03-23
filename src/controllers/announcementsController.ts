@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { Announcement, Audience, Priority } from '../entities/Announcement';
 import { PageQuery, ResponseDTO } from '../dtos/genericDTOs';
-import { AppDataSource } from '../datasource';
+import { AppDataSource } from '../configs/datasource';
 
 const publishAnnouncement = async (req: Request<{}, {}, {
   title: string,

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../datasource';
+import { AppDataSource } from '../configs/datasource';
 import { Project, ProjectStatus } from '../entities/Project';
 import { PageQuery, ResponseDTO } from '../dtos/genericDTOs';
 

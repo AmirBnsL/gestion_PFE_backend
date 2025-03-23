@@ -1,11 +1,10 @@
-import { AppDataSource } from '../datasource';
+import { AppDataSource } from '../configs/datasource';
 import { Teacher } from '../entities/Teacher';
 import { PageQuery, ResponseDTO } from '../dtos/genericDTOs';
 import { Request, Response } from 'express';
 import { Student } from '../entities/Student';
 import { Project, ProjectStatus } from '../entities/Project';
 import { User } from '../entities/User';
-import { Announcement, Audience, Priority } from '../entities/Announcement';
 
 const getTeachers = async (req: Request<{}, {}, {}, PageQuery>, res: Response<ResponseDTO<Teacher[]>>) => {
   const teacherRepository = AppDataSource.getRepository(Teacher);

@@ -1,14 +1,14 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
-import { User } from './entities/User';
+import {User} from '../entities/User';
 import mysql2 from 'mysql2';
-import { Student } from './entities/Student';
-import { Teacher } from './entities/Teacher';
-import { Admin } from './entities/Admin';
+import { Student } from '../entities/Student';
+import { Teacher } from '../entities/Teacher';
+import { Admin } from '../entities/Admin';
 import { SeederOptions } from 'typeorm-extension';
-import { ProjectSeeder, UserSeeder } from './dataloader/seeders';
-import { adminFactory, projectFactory, studentFactory, teacherFactory, userFactory } from './dataloader/factories';
-import { Announcement } from './entities/Announcement';
-import { Project } from './entities/Project';
+import { ProjectSeeder, UserSeeder } from '../dataloader/seeders';
+import { adminFactory, projectFactory, studentFactory, teacherFactory, userFactory } from '../dataloader/factories';
+import { Announcement } from '../entities/Announcement';
+import { Project } from '../entities/Project';
 const options: DataSourceOptions & SeederOptions = {
   type: 'mysql',
   driver: mysql2,

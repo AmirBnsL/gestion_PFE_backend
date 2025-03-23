@@ -4,6 +4,7 @@
   "description": "backend for PFE management app",
   "main": "index.js",
   "scripts": {
+    "clean": "find ./src -name \"*.js\" -type f -delete",
     "build": "npx tsc",
     "start": "concurrently \"npx tsc --watch\" \"nodemon\"",
     "dev:nodemon": "nodemon --config nodemon.json src/index.ts",
@@ -12,7 +13,7 @@
     "swagger": "ts-node --env-file=.env src/swagger.ts",
     "db:create": "ts-node ./node_modules/typeorm-extension/bin/cli.mjs db:create",
     "db:drop": "ts-node ./node_modules/typeorm-extension/bin/cli.mjs db:drop",
-    "seed:run": "ts-node ./node_modules/typeorm-extension/bin/cli.mjs -d ./src/datasource.ts seed:run",
+    "seed:run": "ts-node ./node_modules/typeorm-extension/bin/cli.mjs -d src/configs/datasource.ts seed:run",
     "seed:create": "ts-node ./node_modules/typeorm-extension/bin/cli.mjs seed:create"
   },
   "author": "",

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../datasource';
+import { AppDataSource } from '../configs/datasource';
 import { UserLoginInputType, UserRegistrationInputType } from '../dtos/userDTOs';
 import { ResponseDTO } from '../dtos/genericDTOs';
 import bcrypt from 'bcryptjs';
