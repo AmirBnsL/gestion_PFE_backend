@@ -149,11 +149,14 @@ router.post('/login', validateBody(userLoginSchema), login);
  *         description: Internal server error
  */
 
-// @ts-ignore
+
+
+
 router.get(
   '/profile',
   jwtFilter,
   authorizeRoles([UserRole.STUDENT, UserRole.TEACHER, UserRole.ADMIN]),
+  // @ts-ignore
   getProfile,
 );
 
