@@ -10,7 +10,8 @@ import {
   adminFactory,
   projectFactory,
   studentFactory,
-  teacherFactory, teamFactory,
+  teacherFactory,
+  teamFactory,
   userFactory,
 } from '../dataloader/factories';
 import { Announcement } from '../entities/Announcement';
@@ -26,18 +27,18 @@ const options: DataSourceOptions & SeederOptions = {
   database: process.env['DB_NAME'],
   synchronize: true,
   logging: true,
-  entities: [User, Student, Teacher, Admin, Announcement, Project,Team],
+  entities: [User, Student, Teacher, Admin, Announcement, Project, Team],
   subscribers: [],
   migrations: [],
   dropSchema: true,
-  seeds: [UserSeeder, ProjectSeeder,TeamSeeder],
+  seeds: [UserSeeder, ProjectSeeder, TeamSeeder],
   factories: [
     userFactory,
     studentFactory,
     teacherFactory,
     adminFactory,
     projectFactory,
-    teamFactory
+    teamFactory,
   ],
 };
 

@@ -16,6 +16,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import announcementsRoutes from './routes/announcementsRoutes';
 import { options } from './configs/swaggerConfig';
+import teamRoutes from './routes/teamRoutes';
 
 AppDataSource.initialize()
   .then(async () => {
@@ -59,7 +60,13 @@ app.use(cors());
 
 const port = process.env.PORT || 8080;
 app.use('/api-docs', swagger.serve, swagger.setup(swaggerSpec));
-app.use('/api/', [userRoutes, adminRoutes, projectRoutes, announcementsRoutes]);
+app.use('/api/', [
+  userRoutes,
+  adminRoutes,
+  projectRoutes,
+  announcementsRoutes,
+  teamRoutes,
+]);
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TypeScript Server');
 });
