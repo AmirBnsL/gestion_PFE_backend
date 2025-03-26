@@ -1,7 +1,8 @@
 import { UserRole } from '../entities/User';
 import { Column } from 'typeorm';
-import { AcademicYear, Specialty } from '../entities/Student';
+import { AcademicYear } from '../entities/Student';
 import { Rank, TeacherRole } from '../entities/Teacher';
+import Specialty from '../enums/specialty';
 
 export interface UserType {
   id: number;

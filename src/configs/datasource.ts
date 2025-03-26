@@ -5,16 +5,17 @@ import { Student } from '../entities/Student';
 import { Teacher } from '../entities/Teacher';
 import { Admin } from '../entities/Admin';
 import { SeederOptions } from 'typeorm-extension';
-import { ProjectSeeder, UserSeeder } from '../dataloader/seeders';
+import { ProjectSeeder, TeamSeeder, UserSeeder } from '../dataloader/seeders';
 import {
   adminFactory,
   projectFactory,
   studentFactory,
-  teacherFactory,
+  teacherFactory, teamFactory,
   userFactory,
 } from '../dataloader/factories';
 import { Announcement } from '../entities/Announcement';
 import { Project } from '../entities/Project';
+import { Team } from '../entities/Team';
 const options: DataSourceOptions & SeederOptions = {
   type: 'mysql',
   driver: mysql2,
@@ -24,18 +25,19 @@ const options: DataSourceOptions & SeederOptions = {
   password: process.env['DB_PASS'],
   database: process.env['DB_NAME'],
   synchronize: true,
-  logging: false,
-  entities: [User, Student, Teacher, Admin, Announcement, Project],
+  logging: true,
+  entities: [User, Student, Teacher, Admin, Announcement, Project,Team],
   subscribers: [],
   migrations: [],
   dropSchema: true,
-  seeds: [UserSeeder, ProjectSeeder],
+  seeds: [UserSeeder, ProjectSeeder,TeamSeeder],
   factories: [
     userFactory,
     studentFactory,
     teacherFactory,
     adminFactory,
     projectFactory,
+    teamFactory
   ],
 };
 

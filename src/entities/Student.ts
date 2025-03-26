@@ -2,10 +2,12 @@ import { User } from './User';
 import {
   Column,
   Entity,
-  JoinColumn,
+  JoinColumn, ManyToOne, OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Team } from './Team';
+import Specialty from '../enums/specialty';
 
 export enum StudentStatus {
   ACTIVE = 'ACTIVE',
@@ -13,11 +15,7 @@ export enum StudentStatus {
   GRADUATED = 'GRADUATED',
 }
 
-export enum Specialty {
-  ISI = 'Informations Systems and Internet',
-  SIW = 'Information Systems and Web',
-  AIDS = 'Artificial intelligence and Data Sciences',
-}
+
 
 export enum AcademicYear {
   FIRST = '1st preparatory class',
@@ -50,6 +48,9 @@ export class Student {
   @Column()
   group: number;
 
+  @ManyToOne(()=> Team, team => team.students)
+  team: Team;
+
   @Column({
     type: 'enum',
     enum: Specialty,
@@ -59,4 +60,5 @@ export class Student {
   @OneToOne(() => User, user => user.student)
   @JoinColumn()
   user: User;
+
 }

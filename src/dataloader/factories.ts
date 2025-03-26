@@ -2,9 +2,11 @@ import { User, UserRole } from '../entities/User';
 import { setSeederFactory } from 'typeorm-extension';
 import { faker } from '@faker-js/faker';
 import { Admin } from '../entities/Admin';
-import { AcademicYear, Specialty, Student } from '../entities/Student';
+import { AcademicYear, Student } from '../entities/Student';
 import { Rank, Teacher, TeacherRole } from '../entities/Teacher';
 import { Project, ProjectStatus } from '../entities/Project';
+import Specialty from '../enums/specialty';
+import { Team } from '../entities/Team';
 
 export const userFactory = setSeederFactory(User, () => {
   const user = new User();
@@ -41,6 +43,15 @@ export const studentFactory = setSeederFactory(Student, () => {
     Specialty.SIW,
   ]);
   return student;
+});
+
+
+export const teamFactory = setSeederFactory(Team, () => {
+  const team = new Team();
+  team.name = faker.lorem.word();
+
+
+  return team;
 });
 
 export const teacherFactory = setSeederFactory(Teacher, () => {

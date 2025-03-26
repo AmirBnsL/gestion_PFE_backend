@@ -5,6 +5,7 @@ import { Admin } from '../entities/Admin';
 import { Student } from '../entities/Student';
 import { Teacher } from '../entities/Teacher';
 import { Project } from '../entities/Project';
+import { Team } from '../entities/Team';
 
 export class UserSeeder implements Seeder {
   public async run(
@@ -53,3 +54,39 @@ export class ProjectSeeder implements Seeder {
     }
   }
 }
+
+export class TeamSeeder implements Seeder {
+  public async run(
+    dataSource: DataSource,
+    factoryManager: SeederFactoryManager,
+  ): Promise<any> {
+    const teamFactory = factoryManager.get(Team);
+    const projectRepository = dataSource.getRepository(Project);
+    const studentRepository = dataSource.getRepository(Student);
+
+    const projects = await projectRepository.find();
+    const students = await studentRepository.find();
+
+    for (const project of projects) {
+      const team = await teamFactory.save();
+      team.project = project;
+      team.students = [];
+
+      const numberOfStudents = Math.floor(Math.random() * 5) + 1;
+      const assignedStudentIds = new Set<number>();
+      for (let i = 0; i < numberOfStudents; i++) {
+        const randomStudent = students[Math.floor(Math.random() * students.length)];
+        if (!assignedStudentIds.has(randomStudent.id)) {
+          assignedStudentIds.add(randomStudent.id);
+          team.students.push(randomStudent);
+        }
+
+      }
+
+      await dataSource.getRepository(Team).save(team);
+    }
+  }
+}
+
+
+

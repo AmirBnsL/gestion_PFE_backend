@@ -1,10 +1,11 @@
 import {
   Column,
   Entity,
-  JoinColumn,
+  JoinColumn, ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  ManyToMany
 } from 'typeorm';
 import { User } from './User';
 import { Project } from './Project';
@@ -55,4 +56,7 @@ export class Teacher {
 
   @OneToMany(() => Project, project => project.proposedBy)
   proposedProjects: Project;
+
+  @ManyToMany(() => Project, project => project.supervisedBy)
+  supervisedProjects: Project[];
 }

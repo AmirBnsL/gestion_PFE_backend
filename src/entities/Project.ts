@@ -2,11 +2,14 @@ import {
   BeforeInsert,
   Column,
   Entity,
-  ManyToOne,
+  ManyToOne, OneToMany,
   PrimaryGeneratedColumn,
+  ManyToMany, OneToOne,
 } from 'typeorm';
-import { Specialty } from './Student';
+
 import { Teacher } from './Teacher';
+import { Team } from './Team';
+import Specialty from '../enums/specialty';
 
 export enum ProjectStatus {
   PROPOSED = 'proposed',
@@ -34,6 +37,7 @@ export class Project {
   @Column()
   endDate: Date;
 
+
   @Column({
     type: 'enum',
     enum: Specialty,
@@ -48,6 +52,12 @@ export class Project {
 
   @ManyToOne(() => Teacher, teacher => teacher.proposedProjects)
   proposedBy: Teacher;
+
+  @ManyToMany(() => Teacher, teacher => teacher.supervisedProjects)
+  supervisedBy:Teacher[];
+
+  @OneToOne(() => Team, team => team.project)
+  team:Team;
 
   @Column()
   groupId: number;
