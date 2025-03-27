@@ -6,6 +6,7 @@ import { Student } from '../entities/Student';
 import { Teacher } from '../entities/Teacher';
 import { Project } from '../entities/Project';
 import { Team } from '../entities/Team';
+import { Task } from '../entities/Task';
 
 export class UserSeeder implements Seeder {
   public async run(
@@ -75,12 +76,12 @@ export class TeamSeeder implements Seeder {
       const numberOfStudents = Math.floor(Math.random() * 5) + 1;
       const assignedStudentIds = new Set<number>();
       for (let i = 0; i < numberOfStudents; i++) {
-        const randomStudent = students[Math.floor(Math.random() * students.length)];
+        const randomStudent =
+          students[Math.floor(Math.random() * students.length)];
         if (!assignedStudentIds.has(randomStudent.id)) {
           assignedStudentIds.add(randomStudent.id);
           team.students.push(randomStudent);
         }
-
       }
 
       await dataSource.getRepository(Team).save(team);
@@ -88,5 +89,27 @@ export class TeamSeeder implements Seeder {
   }
 }
 
+export class TaskSeeder implements Seeder {
+  public async run(
+    dataSource: DataSource,
+    factoryManager: SeederFactoryManager,
+  ): Promise<any> {
+    const taskFactory = factoryManager.get(Task);
+    const projectRepository = dataSource.getRepository(Project);
 
+    const projects = await projectRepository.find({
+      relations: ['team', 'team.students'],
+    });
 
+    for (const project of projects) {
+      for (let i = 0; i < 5; i++) {
+        const task = await taskFactory.save();
+        task.project = project;
+        task.assignedTo = [
+          project.team.students[i % project.team.students.length],
+        ];
+        await dataSource.getRepository(Task).save(task);
+      }
+    }
+  }
+}

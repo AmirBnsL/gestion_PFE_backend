@@ -7,6 +7,26 @@ import { Rank, Teacher, TeacherRole } from '../entities/Teacher';
 import { Project, ProjectStatus } from '../entities/Project';
 import Specialty from '../enums/specialty';
 import { Team } from '../entities/Team';
+import { Task, TaskStatus } from '../entities/Task';
+import { Priority } from '../entities/Announcement';
+
+export const taskFactory = setSeederFactory(Task, () => {
+  const task = new Task();
+  task.title = faker.lorem.word();
+  task.description = faker.lorem.sentence();
+  task.dueDate = faker.date.future();
+  task.priority = faker.helpers.arrayElement([
+    Priority.HIGH,
+    Priority.MEDIUM,
+    Priority.LOW,
+  ]);
+  task.status = faker.helpers.arrayElement([
+    TaskStatus.IN_PROGRESS,
+    TaskStatus.TODO,
+    TaskStatus.DONE,
+  ]);
+  return task;
+});
 
 export const userFactory = setSeederFactory(User, () => {
   const user = new User();
@@ -45,11 +65,9 @@ export const studentFactory = setSeederFactory(Student, () => {
   return student;
 });
 
-
 export const teamFactory = setSeederFactory(Team, () => {
   const team = new Team();
   team.name = faker.lorem.word();
-
 
   return team;
 });

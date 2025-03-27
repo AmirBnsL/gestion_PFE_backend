@@ -5,7 +5,12 @@ import { Student } from '../entities/Student';
 import { Teacher } from '../entities/Teacher';
 import { Admin } from '../entities/Admin';
 import { SeederOptions } from 'typeorm-extension';
-import { ProjectSeeder, TeamSeeder, UserSeeder } from '../dataloader/seeders';
+import {
+  ProjectSeeder,
+  TaskSeeder,
+  TeamSeeder,
+  UserSeeder,
+} from '../dataloader/seeders';
 import {
   adminFactory,
   projectFactory,
@@ -31,8 +36,8 @@ const options: DataSourceOptions & SeederOptions = {
   entities: [User, Student, Teacher, Admin, Announcement, Project, Team, Task],
   subscribers: [],
   migrations: [],
-  dropSchema: false,
-  seeds: [UserSeeder, ProjectSeeder, TeamSeeder],
+  dropSchema: true,
+  seeds: [UserSeeder, ProjectSeeder, TeamSeeder, TaskSeeder],
   factories: [
     userFactory,
     studentFactory,
