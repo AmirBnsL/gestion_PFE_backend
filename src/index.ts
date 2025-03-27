@@ -17,13 +17,16 @@ import { Server } from 'socket.io';
 import announcementsRoutes from './routes/announcementsRoutes';
 import { options } from './configs/swaggerConfig';
 import teamRoutes from './routes/teamRoutes';
+import taskRoutes from './routes/taskRoutes';
 
 AppDataSource.initialize()
   .then(async () => {
     // here you can start to work with your database
     console.log('Database is connected');
 
-    await runSeeders(AppDataSource);
+    if (process.env['MODE'] == 'SEED') {
+      await runSeeders(AppDataSource);
+    }
     const userRepository = AppDataSource.getRepository(User);
     const adminRepository = AppDataSource.getRepository(Admin);
 
@@ -66,6 +69,7 @@ app.use('/api/', [
   projectRoutes,
   announcementsRoutes,
   teamRoutes,
+  taskRoutes,
 ]);
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TypeScript Server');

@@ -4,7 +4,7 @@ import { AcademicYear } from '../entities/Student';
 import { Rank, TeacherRole } from '../entities/Teacher';
 import Specialty from '../enums/specialty';
 
-export interface UserType {
+export class UserType {
   id: number;
   password: string;
   firstname: string;
@@ -12,7 +12,7 @@ export interface UserType {
   email: string;
 }
 
-export interface UserRegistrationInputType {
+export class UserRegistrationInputType {
   password: string;
   firstname: string;
   lastname: string;
@@ -20,19 +20,19 @@ export interface UserRegistrationInputType {
   role: UserRole;
 }
 
-export interface UserLoginInputType {
+export class UserLoginInputType {
   email: string;
   password: string;
 }
 
-export interface AdminProfile {
+export class AdminProfile {
   id: number;
   firstname: string;
   lastname: string;
   email: string;
 }
 
-export interface StudentProfile {
+export class StudentProfile {
   firstname: string;
   lastname: string;
   birthdate: Date;
@@ -42,7 +42,7 @@ export interface StudentProfile {
   email: string;
 }
 
-export interface TeacherProfile {
+export class TeacherProfile {
   firstname: string;
   lastname: string;
   birthdate: Date;

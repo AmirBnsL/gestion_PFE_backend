@@ -22,6 +22,7 @@
   "dependencies": {
     "@types/socket.io": "^3.0.1",
     "bcryptjs": "^3.0.2",
+    "class-transformer": "^0.5.1",
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "helmet": "^8.0.0",

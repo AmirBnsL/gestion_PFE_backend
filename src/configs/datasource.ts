@@ -17,6 +17,7 @@ import {
 import { Announcement } from '../entities/Announcement';
 import { Project } from '../entities/Project';
 import { Team } from '../entities/Team';
+import { Task } from '../entities/Task';
 const options: DataSourceOptions & SeederOptions = {
   type: 'mysql',
   driver: mysql2,
@@ -26,11 +27,11 @@ const options: DataSourceOptions & SeederOptions = {
   password: process.env['DB_PASS'],
   database: process.env['DB_NAME'],
   synchronize: true,
-  logging: true,
-  entities: [User, Student, Teacher, Admin, Announcement, Project, Team],
+  logging: false,
+  entities: [User, Student, Teacher, Admin, Announcement, Project, Team, Task],
   subscribers: [],
   migrations: [],
-  dropSchema: true,
+  dropSchema: false,
   seeds: [UserSeeder, ProjectSeeder, TeamSeeder],
   factories: [
     userFactory,

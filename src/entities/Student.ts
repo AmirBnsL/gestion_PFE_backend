@@ -2,20 +2,22 @@ import { User } from './User';
 import {
   Column,
   Entity,
-  JoinColumn, ManyToOne, OneToMany,
+  JoinColumn,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Team } from './Team';
 import Specialty from '../enums/specialty';
+import { Task } from './Task';
 
 export enum StudentStatus {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
   GRADUATED = 'GRADUATED',
 }
-
-
 
 export enum AcademicYear {
   FIRST = '1st preparatory class',
@@ -48,7 +50,7 @@ export class Student {
   @Column()
   group: number;
 
-  @ManyToOne(()=> Team, team => team.students)
+  @ManyToOne(() => Team, team => team.students)
   team: Team;
 
   @Column({
@@ -61,4 +63,6 @@ export class Student {
   @JoinColumn()
   user: User;
 
+  @ManyToMany(() => Task, task => task.assignedTo)
+  tasks: Task[];
 }
