@@ -22,15 +22,17 @@ export class UserSeeder implements Seeder {
     const users = await userFactory.saveMany(20);
 
     for (const user of users) {
-      if (user.role === UserRole.ADMIN) {
-        user.admin = await adminFactory.save();
-        await dataSource.getRepository(User).save(user);
-      } else if (user.role === UserRole.STUDENT) {
-        user.student = await studentFactory.save();
-        await dataSource.getRepository(User).save(user);
-      } else if (user.role === UserRole.TEACHER) {
-        user.teacher = await teacherFactory.save();
-        await dataSource.getRepository(User).save(user);
+      if (user.id !== 1) {
+        if (user.role === UserRole.ADMIN) {
+          user.admin = await adminFactory.save();
+          await dataSource.getRepository(User).save(user);
+        } else if (user.role === UserRole.STUDENT) {
+          user.student = await studentFactory.save();
+          await dataSource.getRepository(User).save(user);
+        } else if (user.role === UserRole.TEACHER) {
+          user.teacher = await teacherFactory.save();
+          await dataSource.getRepository(User).save(user);
+        }
       }
     }
   }
@@ -102,13 +104,13 @@ export class TaskSeeder implements Seeder {
     });
 
     for (const project of projects) {
-      for (let i = 0; i < 5; i++) {
-        const task = await taskFactory.save();
-        task.project = project;
-        task.assignedTo = [
-          project.team.students[i % project.team.students.length],
-        ];
-        await dataSource.getRepository(Task).save(task);
+      for (const team of project.team) {
+        for (let i = 0; i < 5; i++) {
+          const task = await taskFactory.save();
+          task.project = project;
+          task.assignedTo = [team.students[i % team.students.length]];
+          await dataSource.getRepository(Task).save(task);
+        }
       }
     }
   }

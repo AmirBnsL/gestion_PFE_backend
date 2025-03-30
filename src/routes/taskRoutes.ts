@@ -50,6 +50,9 @@ const router = Router();
  *               projectId:
  *                 type: number
  *                 example: 1
+ *               teamId:
+ *                 type: number
+ *                 example: 1
  *     responses:
  *       201:
  *         description: Task created successfully

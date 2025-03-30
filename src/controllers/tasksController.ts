@@ -57,7 +57,8 @@ export const createTask = async (
     }
 
     const students: Student[] = [];
-    const teamId = project.team.id;
+    const teamId = project.team.filter(team => team.id === req.body.teamId)[0]
+      .id;
 
     for (const studentId of req.body.assignedTo) {
       const student = await studentRepository.findOneOrFail({

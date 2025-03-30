@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authorizeRoles, jwtFilter } from '../middleware/authJwt';
 import { UserRole } from '../entities/User';
 import {
+  createProject,
   getApprovedProjects,
   getProjectOverview,
 } from '../controllers/projectController';
@@ -260,6 +261,44 @@ router.post(
   jwtFilter,
   authorizeRoles([UserRole.ADMIN]),
   rejectProject,
+);
+
+/**
+ * @swagger
+ * /api/project:
+ *   post:
+ *     summary: Create a new project
+ *     tags: [Projects]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               specialty :
+ *                 type: string
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Project has been created
+ *       400:
+ *         description: Invalid request parameters
+ *       401:
+ *         description: Unauthorized
+ */
+
+router.post(
+  '/project',
+  jwtFilter,
+  authorizeRoles([UserRole.TEACHER]),
+  // @ts-ignore
+  createProject,
 );
 
 export default router;

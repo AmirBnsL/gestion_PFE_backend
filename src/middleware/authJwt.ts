@@ -4,6 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 import * as fs from 'node:fs';
 import { Request } from 'express';
 import { IncomingHttpHeaders } from 'node:http2';
+import { AppDataSource } from '../configs/datasource';
 
 const private_key = fs.readFileSync('private.pem', 'utf8');
 const public_key = fs.readFileSync('public.pem', 'utf8');
@@ -18,8 +19,9 @@ interface JwtRequestHeader extends IncomingHttpHeaders {
   authorization?: string;
 }
 
-export interface JwtRequest extends Request {
-  user: jwtPayload;
+export interface JwtRequest<P = any, B = any, Q = any>
+  extends Request<P, any, B, Q> {
+  user: User;
   headers: JwtRequestHeader;
 }
 
@@ -48,15 +50,24 @@ const verifyJwt = (token: string) => {
   return jwt.verify(token, public_key) as jwtPayload;
 };
 
-export const jwtFilter = (req: JwtRequest, res: any, next: any) => {
+export const jwtFilter = async (req: JwtRequest, res: any, next: any) => {
   const token = req.headers.authorization;
-
+  const userRepository = AppDataSource.getRepository(User);
   if (!token) {
     return res.status(StatusCodes.UNAUTHORIZED).send({ data: 'Unauthorized' });
   }
   const [bearer, tokenValue] = token.split(' ');
   try {
-    req.user = verifyJwt(tokenValue);
+    const email = verifyJwt(tokenValue).sub;
+
+    req.user = await userRepository.findOneOrFail({
+      where: { email: email },
+      relations: {
+        teacher: true,
+        student: true,
+        admin: true,
+      },
+    });
     console.log(req.user);
     next();
   } catch (error) {

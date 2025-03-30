@@ -9,6 +9,7 @@ export class TaskRequestDTO {
   priority: Priority;
   dueDate: Date;
   projectId: number; // ID of the project
+  teamId: number; // ID of the team
 }
 
 export class TaskDTO {

@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../configs/datasource';
 import { Project, ProjectStatus } from '../entities/Project';
 import { PageQuery, ResponseDTO } from '../dtos/genericDTOs';
+import { JwtRequest } from '../middleware/authJwt';
+import { ProjectDTORequest } from '../dtos/projectDTOS';
 
 const getProjectOverview = async (
   req: Request<{ projectId: string }>,
@@ -27,4 +29,28 @@ const getApprovedProjects = async (
   res.status(200).send({ data: projects[0] });
 };
 
-export { getProjectOverview, getApprovedProjects };
+//TODO: fix JWTrequest to use express's Request generics
+const createProject = async (
+  req: JwtRequest<{}, ProjectDTORequest>,
+  res: Response,
+) => {
+  try {
+    const teacher = req.user.teacher;
+
+    const projectRepository = AppDataSource.getRepository(Project);
+    const project = new Project();
+    project.title = req.body.title;
+    project.description = req.body.description;
+    project.specialty = req.body.specialty;
+
+    project.proposedBy = teacher;
+
+    await projectRepository.save(project);
+    res.status(201).send({ data: 'Project created successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Internal server error' });
+  }
+};
+
+export { getProjectOverview, getApprovedProjects, createProject };

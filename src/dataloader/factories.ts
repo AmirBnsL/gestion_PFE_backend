@@ -114,7 +114,6 @@ export const projectFactory = setSeederFactory(Project, () => {
     ProjectStatus.IN_PROGRESS,
     ProjectStatus.CANCELLED,
   ]);
-  project.groupId = faker.number.int({ min: 1, max: 10 });
   project.createdAt = faker.date.past();
   project.updatedAt = faker.date.recent();
   project.rejectionReason = faker.lorem.sentence();

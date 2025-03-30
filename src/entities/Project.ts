@@ -61,11 +61,8 @@ export class Project {
   @OneToMany(() => Task, task => task.project)
   tasks: Task[];
 
-  @OneToOne(() => Team, team => team.project)
-  team: Team;
-
-  @Column()
-  groupId: number;
+  @OneToMany(() => Team, team => team.project)
+  team: Team[];
 
   @Column()
   createdAt: Date;

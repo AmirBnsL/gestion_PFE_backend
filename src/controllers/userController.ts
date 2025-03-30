@@ -56,12 +56,8 @@ export const getProfile = async (
   req: JwtRequest,
   res: Response<ResponseDTO<UserProfile | string>>,
 ) => {
-  const userRepository = AppDataSource.getRepository(User);
   try {
-    const user = await userRepository.findOneOrFail({
-      where: { email: req.user.sub },
-      relations: ['student', 'admin', 'teacher'],
-    });
+    const user = req.user;
 
     switch (user.role) {
       case UserRole.STUDENT:
