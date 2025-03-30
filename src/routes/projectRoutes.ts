@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authorizeRoles, jwtFilter } from '../middleware/authJwt';
 import { UserRole } from '../entities/User';
 import {
+  assignProjectToTeam,
   createProject,
   getApprovedProjects,
   getProjectOverview,
@@ -299,6 +300,43 @@ router.post(
   authorizeRoles([UserRole.TEACHER]),
   // @ts-ignore
   createProject,
+);
+
+/**
+ * @swagger
+ * /api/project/assign:
+ *   post:
+ *     summary: Assign a project to a team
+ *     tags: [Projects]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               projectId:
+ *                 type: number
+ *               teamId:
+ *                 type: number
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Project has been assigned to the team
+ *
+ *       400:
+ *         description: Specialty mismatch
+ *       401:
+ *         description: Unauthorized
+ */
+
+router.post(
+  '/project/assign',
+  jwtFilter,
+  authorizeRoles([UserRole.ADMIN]),
+  // @ts-ignore
+  assignProjectToTeam,
 );
 
 export default router;
