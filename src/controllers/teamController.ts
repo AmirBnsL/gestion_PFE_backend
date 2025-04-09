@@ -44,3 +44,18 @@ export const getTeamByProjectId = async (
     }
   }
 };
+
+export const createTeam = async (
+  req: Request<{}, {}, TeamDTO>,
+  res: Response,
+) => {};
+
+export const joinTeam = async (
+  req: Request<{ teamId: string }>,
+  res: Response,
+) => {};
+
+export const leaveTeam = async (
+  req: Request<{ teamId: string }>,
+  res: Response,
+) => {};

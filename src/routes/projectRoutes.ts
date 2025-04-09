@@ -7,7 +7,12 @@ import {
   getApprovedProjects,
   getProjectOverview,
 } from '../controllers/projectController';
-import { paginationSchema, validateQuery } from '../middleware/validation';
+import {
+  paginationSchema,
+  projectCreationSchema,
+  validateBody,
+  validateQuery,
+} from '../middleware/validation';
 import {
   approveProject,
   getPendingApprovalProjects,
@@ -296,6 +301,7 @@ router.post(
 
 router.post(
   '/project',
+  validateBody(projectCreationSchema),
   jwtFilter,
   authorizeRoles([UserRole.TEACHER]),
   // @ts-ignore

@@ -5,6 +5,11 @@ import {
   getAnnouncments,
   publishAnnouncement,
 } from '../controllers/announcementsController';
+import {
+  announcementCreationSchema,
+  taskCreationSchema,
+  validateBody,
+} from '../middleware/validation';
 
 const router = Router();
 
@@ -50,6 +55,7 @@ const router = Router();
 
 router.post(
   '/announcement',
+  validateBody(announcementCreationSchema),
   jwtFilter,
   authorizeRoles([UserRole.ADMIN]),
   publishAnnouncement,

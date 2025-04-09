@@ -2,10 +2,40 @@ import { NextFunction } from 'express';
 import { Request, Response } from 'express';
 import { z, ZodError } from 'zod';
 import { StatusCodes } from 'http-status-codes';
+import specialty from '../enums/specialty';
+import { TaskStatus } from '../entities/Task';
+import { Audience, Priority } from '../entities/Announcement';
 
 /**
  * Here we put all the validation schemas
  */
+
+export const projectCreationSchema = z.object({
+  title: z.string().min(3, { message: 'Title must be at least 3 characters' }),
+  description: z
+    .string()
+    .min(10, { message: 'Description must be at least 10 characters' }),
+  specialty: z.enum([specialty.ISI, specialty.SIW, specialty.AIDS]),
+});
+
+export const taskCreationSchema = z.object({
+  status: z.enum([TaskStatus.DONE, TaskStatus.IN_PROGRESS, TaskStatus.TODO]),
+  title: z.string().min(3, { message: 'Title must be at least 3 characters' }),
+  description: z
+    .string()
+    .min(10, { message: 'Description must be at least 10 characters' }),
+  dueDate: z.date(),
+  priority: z.enum([Priority.LOW, Priority.MEDIUM, Priority.HIGH]),
+  projectId: z.coerce.number().int().positive(),
+  teamId: z.coerce.number().int().positive(),
+});
+
+export const announcementCreationSchema = z.object({
+  title: z.string().min(3, { message: 'Title must be at least 3 characters' }),
+  body: z.string().min(10, { message: 'Body must be at least 10 characters' }),
+  audience: z.enum([Audience.ALL, Audience.STUDENTS, Audience.TEACHERS]),
+  priority: z.enum([Priority.LOW, Priority.MEDIUM, Priority.HIGH]),
+});
 
 const passwordSchema = z
   .string()

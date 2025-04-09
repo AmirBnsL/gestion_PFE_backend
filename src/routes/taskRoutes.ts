@@ -5,6 +5,7 @@ import {
   createTask,
   getTasksByProjectId,
 } from '../controllers/tasksController';
+import { taskCreationSchema, validateBody } from '../middleware/validation';
 
 const router = Router();
 
@@ -66,6 +67,7 @@ const router = Router();
 
 router.post(
   '/task',
+  validateBody(taskCreationSchema),
   jwtFilter,
   authorizeRoles([UserRole.ADMIN, UserRole.TEACHER]),
   createTask,
