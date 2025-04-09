@@ -27,10 +27,36 @@ export enum AcademicYear {
   FIFTH = '3rd superior class',
 }
 
+export enum StudentJob {
+  FRONTEND = 'Front-end',
+  BACKEND = 'Back-end',
+  FULLSTACK = 'Full-stack',
+  DEVOPS = 'DevOps',
+  DATA_SCIENTIST = 'Data Scientist',
+  DATA_ANALYST = 'Data Analyst',
+  GAME_DEV = 'Game Developer',
+  MOBILE_DEV = 'Mobile Developer',
+  QA = 'Quality Assurance',
+  UI_UX = 'UI/UX Designer',
+}
+
 @Entity('student')
 export class Student {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({
+    type: 'enum',
+    enum: StudentStatus,
+    default: StudentStatus.ACTIVE,
+  })
+  status: StudentStatus;
+
+  @Column({
+    type: 'enum',
+    enum: StudentJob,
+  })
+  job: StudentJob;
 
   @Column()
   firstname: string;

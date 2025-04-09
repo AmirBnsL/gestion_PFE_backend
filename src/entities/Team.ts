@@ -15,6 +15,10 @@ export class Team {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @OneToOne(() => Student, { cascade: true })
+  @JoinColumn()
+  teamLeader: Student;
+
   @Column()
   name: string;
 

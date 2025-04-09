@@ -45,8 +45,22 @@ export const getTeamByProjectId = async (
   }
 };
 
+//TODO: THIS IS GONNA BE DONE THIS SPRINT
 export const createTeam = async (
   req: Request<{}, {}, TeamDTO>,
+  res: Response,
+) => {};
+
+//done by team leader
+export const sendInvite = async (
+  req: Request<{ teamId: string }>,
+  res: Response,
+) => {};
+
+//done by team leader
+
+export const acceptInvite = async (
+  req: Request<{ teamId: string }>,
   res: Response,
 ) => {};
 
