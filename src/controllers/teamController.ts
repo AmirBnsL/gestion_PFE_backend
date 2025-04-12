@@ -9,6 +9,7 @@ import { Parameter } from '../entities/Parameter';
 import { Student } from '../entities/Student';
 import { TeamInvite } from '../entities/TeamInvite';
 import { User } from '../entities/User';
+import { TeamJoinRequest } from '../entities/TeamJoinRequest';
 
 interface TeamDTO {
   name: string;
@@ -85,7 +86,8 @@ export const createTeam = async (
 
     const team = new Team();
     team.name = req.body.name;
-    team.teamLeader = user.student;
+    team.teamLeader = student;
+    team.specialty = student.specialty;
 
     await teamRepository.save(team);
 
@@ -105,8 +107,6 @@ export const sendInvite = async (
   req: JwtRequest<{}, { email: string }>,
   res: Response,
 ) => {
-  const parameterRepository = AppDataSource.getRepository(Parameter);
-
   const studentRepository = AppDataSource.getRepository(Student);
   const teamInviteRepository = AppDataSource.getRepository(TeamInvite);
   const userRepository = AppDataSource.getRepository(User);
@@ -177,6 +177,68 @@ export const sendInvite = async (
     res.status(200).send({ data: 'Invite sent successfully' });
   } catch (e) {
     res.status(500).send({ data: e });
+  }
+};
+
+export const requestTeam = async (
+  req: JwtRequest<{ teamId: string }>,
+  res: Response,
+) => {
+  const parameterRepository = AppDataSource.getRepository(Parameter);
+  const teamRepository = AppDataSource.getRepository(Team);
+  const teamJoinRequestRepository =
+    AppDataSource.getRepository(TeamJoinRequest);
+
+  try {
+    const parameter = await parameterRepository.findOneOrFail({
+      where: { year: req.user.student.academicYear },
+    });
+
+    const student = req.user.student;
+
+    if (student.teamMembership) {
+      return { status: 400, message: 'Student already has a team' };
+    }
+
+    const team = await teamRepository.findOneOrFail({
+      where: { id: parseInt(req.params.teamId) },
+      relations: { members: true },
+    });
+
+    const existingInvite = await teamJoinRequestRepository.findOne({
+      where: {
+        team: { id: team.id },
+        fromUser: { id: student.id },
+        status: 'pending', // Check only for active/pending invites
+      },
+    });
+
+    if (existingInvite) {
+      return res.status(400).send({ data: 'Request already sent' });
+    }
+
+    if (team.members.some(member => member.id === student.id)) {
+      res.status(404).send({ data: 'Student already in this team' });
+    }
+
+    if (team.members.length >= parameter.maxTeamSize) {
+      res.status(400).send({ data: 'Team is full' });
+    }
+    if (student.specialty != team.specialty) {
+      res.status(400).send({ data: 'Specialty mismatch' });
+    }
+
+    const teamJoinRequest = new TeamJoinRequest();
+    teamJoinRequest.team = team;
+    teamJoinRequest.fromUser = student;
+    teamJoinRequest.status = 'pending';
+    teamJoinRequest.createdAt = new Date();
+
+    await teamJoinRequestRepository.save(teamJoinRequest);
+
+    res.status(200).send({ data: 'Request sent successfully' });
+  } catch (e) {
+    return { status: 500, message: e };
   }
 };
 

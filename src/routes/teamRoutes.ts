@@ -3,6 +3,7 @@ import { authorizeRoles, jwtFilter } from '../middleware/authJwt';
 import {
   createTeam,
   getTeamByProjectId,
+  requestTeam,
   sendInvite,
 } from '../controllers/teamController';
 import { UserRole } from '../entities/User';
@@ -114,6 +115,37 @@ router.post(
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore
   sendInvite,
+);
+
+/**
+ * @swagger
+ * /api/team/request/{teamId}:
+ *   post:
+ *     summary: Request to join a team
+ *     tags: [Teams]
+ *     parameters:
+ *       - in: path
+ *         name: teamId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the team
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Request sent successfully
+ *       404:
+ *         description: Team not found
+ *
+ */
+
+router.post(
+  '/team/request/:teamId',
+  jwtFilter,
+  authorizeRoles([UserRole.STUDENT]),
+  // @ts-ignore
+  requestTeam,
 );
 
 export default router;

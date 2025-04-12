@@ -13,6 +13,7 @@ import { Student } from './Student';
 import { TeamMembership } from './TeamMemberships';
 import { TeamInvite } from './TeamInvite';
 import { TeamJoinRequest } from './TeamJoinRequest';
+import Specialty from '../enums/specialty';
 
 @Entity()
 @Unique(['name'])
@@ -23,6 +24,12 @@ export class Team {
   @OneToOne(() => Student, { cascade: true })
   @JoinColumn()
   teamLeader: Student;
+
+  @Column({
+    type: 'enum',
+    enum: Specialty,
+  })
+  specialty: Specialty;
 
   @Column()
   name: string;
