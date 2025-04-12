@@ -1,5 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import 'reflect-metadata';
+import 'express-async-handler';
 import swagger from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import morgan from 'morgan';
@@ -18,6 +19,7 @@ import announcementsRoutes from './routes/announcementsRoutes';
 import { options } from './configs/swaggerConfig';
 import teamRoutes from './routes/teamRoutes';
 import taskRoutes from './routes/taskRoutes';
+import { errorHandler } from './middleware/errorHandler';
 
 AppDataSource.initialize()
   .then(async () => {
@@ -79,4 +81,5 @@ server.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
 
+app.use(errorHandler);
 //TODO : Authorization, Authentication ,CRUD of users,One to one relation ship with users

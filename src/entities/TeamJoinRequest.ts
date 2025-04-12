@@ -8,6 +8,7 @@ import {
 import { Team } from './Team';
 import { Student } from './Student';
 
+// team invite is issued by student to a team
 @Entity()
 export class TeamJoinRequest {
   @PrimaryGeneratedColumn()

@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { Team } from './Team';
 import { Student } from './Student';
-
+//team invite is issued by team leader to a student
 @Entity()
 export class TeamInvite {
   @PrimaryGeneratedColumn()

@@ -5,6 +5,8 @@ import {
   getTeamByProjectId,
   requestTeam,
   sendInvite,
+  acceptInvite,
+  acceptJoinRequest,
 } from '../controllers/teamController';
 import { UserRole } from '../entities/User';
 
@@ -83,20 +85,17 @@ router.post(
 
 /**
  * @swagger
- * /api/team/invite:
+ * /api/team/invite/{email}:
  *   post:
  *     summary: Invite a student to a team
  *     tags: [Teams]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               studentId:
- *                 type: string
- *
+ *     parameters:
+ *       - in: path
+ *         name: email
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: email of the target student
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -110,7 +109,7 @@ router.post(
  */
 
 router.post(
-  '/team/invite',
+  '/team/invite/:email',
   jwtFilter,
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore
@@ -146,6 +145,68 @@ router.post(
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore
   requestTeam,
+);
+
+/**
+ * @swagger
+ * /api/team/request/accept/{studentId}:
+ *   post:
+ *     summary: Accept a join request by a the team leader
+ *     tags: [Teams]
+ *     parameters:
+ *       - in: path
+ *         name: studentId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: id of request sender
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Request accepted successfully
+ *       403:
+ *         description: Unauthorized Or not team leader
+ *
+ */
+
+router.post(
+  '/team/request/accept/:studentId',
+  jwtFilter,
+  authorizeRoles([UserRole.STUDENT]),
+  // @ts-ignore
+  acceptJoinRequest,
+);
+
+/**
+ * @swagger
+ * /api/team/invite/accept/{teamId}:
+ *   post:
+ *     summary: Accept an invitation to join a team
+ *     tags: [Teams]
+ *     parameters:
+ *       - in: path
+ *         name: teamId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the team
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Invitation accepted successfully
+ *       404:
+ *         description: Team not found
+ *
+ */
+
+router.post(
+  '/team/invite/accept/:teamId',
+  jwtFilter,
+  authorizeRoles([UserRole.STUDENT]),
+  // @ts-ignore
+  acceptInvite,
 );
 
 export default router;
