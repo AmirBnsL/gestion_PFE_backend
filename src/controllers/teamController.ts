@@ -105,6 +105,8 @@ export const sendInvite = async (
   req: JwtRequest<{}, { email: string }>,
   res: Response,
 ) => {
+  const parameterRepository = AppDataSource.getRepository(Parameter);
+
   const studentRepository = AppDataSource.getRepository(Student);
   const teamInviteRepository = AppDataSource.getRepository(TeamInvite);
   const userRepository = AppDataSource.getRepository(User);
@@ -133,6 +135,18 @@ export const sendInvite = async (
       relations: { student: { teamMembership: true } },
     });
     const student = user.student;
+
+    const existingInvite = await teamInviteRepository.findOne({
+      where: {
+        team: { id: team.id },
+        toUser: { id: student.id },
+        status: 'pending', // Check only for active/pending invites
+      },
+    });
+
+    if (existingInvite) {
+      return res.status(400).send({ data: 'Invite already sent' });
+    }
 
     if (student.academicYear != senderStudent.academicYear) {
       return res.status(400).send({
