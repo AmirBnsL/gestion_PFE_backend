@@ -12,6 +12,9 @@ import {
 import { Team } from './Team';
 import Specialty from '../enums/specialty';
 import { Task } from './Task';
+import { TeamMembership } from './TeamMemberships';
+import { TeamInvite } from './TeamInvite';
+import { TeamJoinRequest } from './TeamJoinRequest';
 
 export enum StudentStatus {
   ACTIVE = 'ACTIVE',
@@ -76,9 +79,6 @@ export class Student {
   @Column()
   group: number;
 
-  @ManyToOne(() => Team, team => team.students)
-  team: Team;
-
   @Column({
     type: 'enum',
     enum: Specialty,
@@ -91,4 +91,19 @@ export class Student {
 
   @ManyToMany(() => Task, task => task.assignedTo)
   tasks: Task[];
+
+  @OneToOne(() => TeamMembership, membership => membership.student)
+  teamMembership: TeamMembership;
+
+  // Members of the team (via TeamMembership)
+  @OneToMany(() => TeamMembership, membership => membership.team)
+  memberships: TeamMembership[];
+
+  // Invites sent by this team
+  @OneToMany(() => TeamInvite, invite => invite.team)
+  invites: TeamInvite[];
+
+  // Join requests sent to this team
+  @OneToMany(() => TeamJoinRequest, request => request.team)
+  joinRequests: TeamJoinRequest[];
 }

@@ -47,7 +47,12 @@ const verifyJwt = (token: string) => {
   if (!public_key) {
     throw new Error('PUBLIC_KEY is not set');
   }
-  return jwt.verify(token, public_key) as jwtPayload;
+  try {
+    return jwt.verify(token, public_key) as jwtPayload;
+  } catch (error) {
+    console.log(error);
+    throw new Error('Invalid token');
+  }
 };
 
 export const jwtFilter = async (req: JwtRequest, res: any, next: any) => {

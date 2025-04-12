@@ -6,6 +6,7 @@ import { Teacher } from '../entities/Teacher';
 import { Admin } from '../entities/Admin';
 import { SeederOptions } from 'typeorm-extension';
 import {
+  ParameterSeeder,
   ProjectSeeder,
   TaskSeeder,
   TeamSeeder,
@@ -23,6 +24,10 @@ import { Announcement } from '../entities/Announcement';
 import { Project } from '../entities/Project';
 import { Team } from '../entities/Team';
 import { Task } from '../entities/Task';
+import { Parameter } from '../entities/Parameter';
+import { TeamMembership } from '../entities/TeamMemberships';
+import { TeamInvite } from '../entities/TeamInvite';
+import { TeamJoinRequest } from '../entities/TeamJoinRequest';
 const options: DataSourceOptions & SeederOptions = {
   type: 'mysql',
   driver: mysql2,
@@ -33,11 +38,24 @@ const options: DataSourceOptions & SeederOptions = {
   database: process.env['DB_NAME'],
   synchronize: true,
   logging: false,
-  entities: [User, Student, Teacher, Admin, Announcement, Project, Team, Task],
+  entities: [
+    User,
+    Student,
+    Teacher,
+    Admin,
+    Announcement,
+    Project,
+    Team,
+    Task,
+    Parameter,
+    TeamMembership,
+    TeamInvite,
+    TeamJoinRequest,
+  ],
   subscribers: [],
   migrations: [],
-  dropSchema: true,
-  seeds: [UserSeeder, ProjectSeeder, TeamSeeder, TaskSeeder],
+  dropSchema: false,
+  seeds: [UserSeeder, ProjectSeeder, ParameterSeeder],
   factories: [
     userFactory,
     studentFactory,

@@ -71,7 +71,7 @@ const assignProjectToTeam = async (
       relations: ['students'],
     });
     //TODO: think of adding specialty to team entity
-    if (project.specialty !== team.students[0].specialty) {
+    if (project.specialty !== team.members[0].student.specialty) {
       return res.status(400).send({ message: 'Specialty mismatch' });
     }
     project.team.push(team);

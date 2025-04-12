@@ -2,11 +2,12 @@ import { DataSource } from 'typeorm';
 import { Seeder, SeederFactoryManager } from 'typeorm-extension';
 import { User, UserRole } from '../entities/User';
 import { Admin } from '../entities/Admin';
-import { Student } from '../entities/Student';
+import { AcademicYear, Student } from '../entities/Student';
 import { Teacher } from '../entities/Teacher';
 import { Project } from '../entities/Project';
 import { Team } from '../entities/Team';
 import { Task } from '../entities/Task';
+import { Parameter } from '../entities/Parameter';
 
 export class UserSeeder implements Seeder {
   public async run(
@@ -73,7 +74,7 @@ export class TeamSeeder implements Seeder {
     for (const project of projects) {
       const team = await teamFactory.save();
       team.project = project;
-      team.students = [];
+      team.members = [];
 
       const numberOfStudents = Math.floor(Math.random() * 5) + 1;
       const assignedStudentIds = new Set<number>();
@@ -82,7 +83,7 @@ export class TeamSeeder implements Seeder {
           students[Math.floor(Math.random() * students.length)];
         if (!assignedStudentIds.has(randomStudent.id)) {
           assignedStudentIds.add(randomStudent.id);
-          team.students.push(randomStudent);
+          //TODO: fix this
         }
       }
 
@@ -108,10 +109,54 @@ export class TaskSeeder implements Seeder {
         for (let i = 0; i < 5; i++) {
           const task = await taskFactory.save();
           task.project = project;
-          task.assignedTo = [team.students[i % team.students.length]];
+          //TODO: fix this
           await dataSource.getRepository(Task).save(task);
         }
       }
+    }
+  }
+}
+
+export class ParameterSeeder implements Seeder {
+  public async run(
+    dataSource: DataSource,
+    factoryManager: SeederFactoryManager,
+  ): Promise<any> {
+    const parameterRepository = dataSource.getRepository(Parameter);
+    const parameters: Parameter[] = [
+      {
+        id: 1,
+        maxTeamSize: 5,
+        allowTeamCreation: true,
+        year: AcademicYear.FIRST,
+      },
+      {
+        id: 2,
+        maxTeamSize: 5,
+        allowTeamCreation: true,
+        year: AcademicYear.SECOND,
+      },
+      {
+        id: 3,
+        maxTeamSize: 5,
+        allowTeamCreation: true,
+        year: AcademicYear.THIRD,
+      },
+      {
+        id: 4,
+        maxTeamSize: 5,
+        allowTeamCreation: true,
+        year: AcademicYear.FOURTH,
+      },
+      {
+        id: 5,
+        maxTeamSize: 5,
+        allowTeamCreation: true,
+        year: AcademicYear.FIFTH,
+      },
+    ];
+    for (const parameter of parameters) {
+      await parameterRepository.save(parameter);
     }
   }
 }

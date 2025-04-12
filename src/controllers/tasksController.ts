@@ -62,7 +62,7 @@ export const createTask = async (
 
     for (const studentId of req.body.assignedTo) {
       const student = await studentRepository.findOneOrFail({
-        where: { id: studentId, team: { id: teamId } },
+        where: { id: studentId, teamMembership: { id: teamId } },
       });
       students.push(student);
     }

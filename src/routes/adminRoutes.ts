@@ -48,6 +48,7 @@ const router = express.Router();
  *       500:
  *         description: Internal server error
  */
+
 router.get(
   '/teachers',
   jwtFilter,

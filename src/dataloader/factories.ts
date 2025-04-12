@@ -9,6 +9,7 @@ import Specialty from '../enums/specialty';
 import { Team } from '../entities/Team';
 import { Task, TaskStatus } from '../entities/Task';
 import { Priority } from '../entities/Announcement';
+import bcrypt from 'bcryptjs';
 
 export const taskFactory = setSeederFactory(Task, () => {
   const task = new Task();
@@ -32,7 +33,7 @@ export const userFactory = setSeederFactory(User, () => {
   const user = new User();
   user.email = faker.internet.email();
   user.role = faker.helpers.arrayElement([UserRole.STUDENT, UserRole.TEACHER]);
-  user.passwordHash = faker.internet.password();
+  user.passwordHash = 'admin';
   return user;
 });
 

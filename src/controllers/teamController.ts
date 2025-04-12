@@ -3,13 +3,15 @@ import { Team } from '../entities/Team';
 import { Request, Response } from 'express';
 import { Project } from '../entities/Project';
 import { EntityNotFoundError } from 'typeorm';
+import { JwtRequest } from '../middleware/authJwt';
+import { TeamMembership } from '../entities/TeamMemberships';
+import { Parameter } from '../entities/Parameter';
 import { Student } from '../entities/Student';
+import { TeamInvite } from '../entities/TeamInvite';
+import { User } from '../entities/User';
 
 interface TeamDTO {
-  id: number;
   name: string;
-  project: Project;
-  students: Student[];
 }
 
 export const getTeamByProjectId = async (
@@ -32,7 +34,7 @@ export const getTeamByProjectId = async (
     });
     const team = await teamRepository.findOneOrFail({
       where: { project: { id: project.id } },
-      relations: { students: true },
+      relations: { members: true },
     });
     res.status(200).send({ data: team });
   } catch (e) {
@@ -46,19 +48,125 @@ export const getTeamByProjectId = async (
 };
 
 //TODO: THIS IS GONNA BE DONE THIS SPRINT
+
 export const createTeam = async (
-  req: Request<{}, {}, TeamDTO>,
+  req: JwtRequest<{}, TeamDTO>,
   res: Response,
-) => {};
+) => {
+  try {
+    const parameterRepository = AppDataSource.getRepository(Parameter);
+
+    const user = req.user;
+    const student = user.student;
+    const parameters = await parameterRepository.findOneOrFail({
+      where: { year: student.academicYear },
+    });
+    if (!parameters.allowTeamCreation) {
+      return res.status(400).send({
+        message: 'Team creation is not allowed for this academic year',
+      });
+    }
+
+    const teamMembershipRepository =
+      AppDataSource.getRepository(TeamMembership);
+    const isStudentInTeam = await teamMembershipRepository.exists({
+      where: { student: student },
+    });
+
+    if (isStudentInTeam) {
+      return res.status(400).send({
+        message: 'Student already has a team',
+      });
+    }
+
+    const teamRepository = AppDataSource.getRepository(Team);
+
+    const membership = new TeamMembership();
+
+    const team = new Team();
+    team.name = req.body.name;
+    team.teamLeader = user.student;
+
+    await teamRepository.save(team);
+
+    membership.team = team;
+    membership.student = student;
+    membership.joinedAt = new Date();
+
+    await teamMembershipRepository.save(membership);
+    res.status(200).send({ data: 'Team created successfully' });
+  } catch (e) {
+    res.status(500).send({ message: e });
+  }
+};
 
 //done by team leader
 export const sendInvite = async (
-  req: Request<{ teamId: string }>,
+  req: JwtRequest<{}, { email: string }>,
   res: Response,
-) => {};
+) => {
+  const studentRepository = AppDataSource.getRepository(Student);
+  const teamInviteRepository = AppDataSource.getRepository(TeamInvite);
+  const userRepository = AppDataSource.getRepository(User);
+  try {
+    const senderStudent = await studentRepository.findOneOrFail({
+      where: { id: req.user.student.id },
+      relations: {
+        teamMembership: { team: { teamLeader: true, members: true } },
+      },
+    });
+
+    const team = senderStudent.teamMembership.team;
+    if (!team) {
+      return res.status(404).send({ data: 'Team not found' });
+    }
+    const isTeamLeader = team.teamLeader.id === senderStudent.id;
+
+    if (!isTeamLeader) {
+      return res.status(403).send({ data: 'Student is not team leader' });
+    }
+
+    const user = await userRepository.findOneOrFail({
+      where: {
+        email: req.body.email,
+      },
+      relations: { student: { teamMembership: true } },
+    });
+    const student = user.student;
+
+    if (student.academicYear != senderStudent.academicYear) {
+      return res.status(400).send({
+        data: 'Student is not in the same academic year',
+      });
+    }
+
+    const isStudentInTeam = team.members.some(
+      member => member.id === student.id,
+    );
+
+    if (isStudentInTeam) {
+      return res.status(400).send({ data: 'Student already in the team' });
+    }
+
+    if (student.teamMembership) {
+      return res.status(400).send({ data: 'Student already has a team' });
+    }
+
+    const invite = new TeamInvite();
+    invite.team = team;
+    invite.toUser = student;
+    invite.createdAt = new Date();
+    invite.status = 'pending';
+
+    await teamInviteRepository.save(invite);
+
+    res.status(200).send({ data: 'Invite sent successfully' });
+  } catch (e) {
+    res.status(500).send({ data: e });
+  }
+};
 
 //done by team leader
-
 export const acceptInvite = async (
   req: Request<{ teamId: string }>,
   res: Response,
