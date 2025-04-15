@@ -300,6 +300,34 @@ export const acceptInvite = async (
   }
 };
 
+export const declineInvite = async (
+  req: JwtRequest<{ teamId: string }>,
+  res: Response,
+) => {
+  try {
+    const teamInviteRepository = AppDataSource.getRepository(TeamInvite);
+
+    const invite = await teamInviteRepository.findOneOrFail({
+      where: {
+        team: { id: parseInt(req.params.teamId) },
+        status: 'pending',
+        toUser: { id: req.user.student.id },
+      },
+    });
+
+    invite.status = 'declined';
+    await teamInviteRepository.save(invite);
+
+    res.status(200).send({ data: 'Invite declined successfully' });
+  } catch (e) {
+    if (e instanceof EntityNotFoundError) {
+      res.status(400).send({ data: 'Team invite not found' });
+    } else {
+      res.status(500).send({ data: 'Internal server error' });
+    }
+  }
+};
+
 //team leader accepts request from a student
 export const acceptJoinRequest = async (
   req: JwtRequest<{ studentId: string }>,
@@ -359,6 +387,34 @@ export const acceptJoinRequest = async (
   } catch (e) {
     if (e instanceof EntityNotFoundError) {
       res.status(400).send({ data: e.message });
+    } else {
+      res.status(500).send({ data: e });
+    }
+  }
+};
+
+export const declineJoinRequest = async (
+  req: JwtRequest<{ studentId: string }>,
+  res: Response,
+) => {
+  const teamJoinRequestRepository =
+    AppDataSource.getRepository(TeamJoinRequest);
+  try {
+    const joinRequest = await teamJoinRequestRepository.findOneOrFail({
+      where: {
+        team: { id: parseInt(req.params.studentId) },
+        status: 'pending',
+        fromUser: { id: req.user.student.id },
+      },
+    });
+
+    joinRequest.status = 'declined';
+    await teamJoinRequestRepository.save(joinRequest);
+
+    res.status(200).send({ data: 'Join request declined successfully' });
+  } catch (e) {
+    if (e instanceof EntityNotFoundError) {
+      res.status(400).send({ data: 'Join request not found' });
     } else {
       res.status(500).send({ data: e });
     }

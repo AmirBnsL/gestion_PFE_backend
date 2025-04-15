@@ -7,6 +7,8 @@ import {
   sendInvite,
   acceptInvite,
   acceptJoinRequest,
+  declineInvite,
+  declineJoinRequest,
 } from '../controllers/teamController';
 import { UserRole } from '../entities/User';
 
@@ -207,6 +209,68 @@ router.post(
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore
   acceptInvite,
+);
+
+/**
+ * @swagger
+ * /api/team/invite/reject/{teamId}:
+ *   post:
+ *     summary: Reject an invitation to join a team
+ *     tags: [Teams]
+ *     parameters:
+ *       - in: path
+ *         name: teamId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the team
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Invitation rejected successfully
+ *       404:
+ *         description: Team not found
+ *
+ */
+
+router.post(
+  '/team/invite/decline/:teamId',
+  jwtFilter,
+  authorizeRoles([UserRole.STUDENT]),
+  // @ts-ignore
+  declineInvite,
+);
+
+/**
+ * @swagger
+ * /api/team/request/decline/{studentId}:
+ *   post:
+ *     summary: Decline a join request by a the team leader
+ *     tags: [Teams]
+ *     parameters:
+ *       - in: path
+ *         name: studentId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: id of request sender
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Request declined successfully
+ *       403:
+ *         description: Unauthorized Or not team leader
+ *
+ */
+
+router.post(
+  '/team/request/decline/:studentId',
+  jwtFilter,
+  authorizeRoles([UserRole.STUDENT]),
+  // @ts-ignore
+  declineJoinRequest,
 );
 
 export default router;
