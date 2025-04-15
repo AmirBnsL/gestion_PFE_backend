@@ -11,6 +11,9 @@ import { TeamInvite } from '../entities/TeamInvite';
 import { User } from '../entities/User';
 import { TeamJoinRequest } from '../entities/TeamJoinRequest';
 import { ResourceNotFoundError } from '../errors/AppError';
+import { WishList } from '../entities/WishList';
+import { WishListEntry } from '../entities/WishListEntry';
+import { WishListEntryDTO } from '../dtos/projectDTOS';
 
 interface TeamDTO {
   name: string;
@@ -430,3 +433,46 @@ export const leaveTeam = async (
   req: Request<{ teamId: string }>,
   res: Response,
 ) => {};
+
+export const createWishList = async (
+  req: JwtRequest<{}, WishListEntryDTO[]>,
+  res: Response,
+) => {
+  const wishListRepository = AppDataSource.getRepository(WishList);
+  const wishListEntryRepository = AppDataSource.getRepository(WishListEntry);
+  const teamRepository = AppDataSource.getRepository(Team);
+  const projectRepository = AppDataSource.getRepository(Project);
+
+  try {
+    const student = req.user.student;
+
+    const team = await teamRepository.findOneOrFail({
+      where: { teamLeader: { id: student.id } },
+    });
+
+    const wishList = new WishList();
+    for (const entry of req.body) {
+      const wishListEntry = new WishListEntry();
+      const project = await projectRepository.findOneOrFail({
+        where: { id: entry.project }})
+        if (project.specialty != team.specialty) {
+          return res.status(400).send({
+            data: 'Project specialty does not match team specialty',
+          });
+        }
+      wishListEntry.project = project;
+      wishListEntry.priority = entry.priority;
+      wishList.entries.push(wishListEntry);
+      await wishListEntryRepository.save(wishListEntry);
+    }
+
+    wishList.team = team;
+    
+
+    await wishListRepository.save(wishList);
+
+    res.status(200).send({ data: 'Wish list created successfully' });
+  } catch (e) {
+    res.status(500).send({ data: e });
+  }
+}

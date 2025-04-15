@@ -14,6 +14,7 @@ import { TeamMembership } from './TeamMemberships';
 import { TeamInvite } from './TeamInvite';
 import { TeamJoinRequest } from './TeamJoinRequest';
 import Specialty from '../enums/specialty';
+import { WishList } from './WishList';
 
 @Entity()
 @Unique(['name'])
@@ -47,4 +48,9 @@ export class Team {
   // Join requests sent to this team
   @OneToMany(() => TeamJoinRequest, request => request.team)
   joinRequests: TeamJoinRequest[];
+
+  // Wish list of preferred projects
+@OneToOne(() => WishList, (wishList) => wishList.team, { cascade: true })
+wishList: WishList;
+
 }
