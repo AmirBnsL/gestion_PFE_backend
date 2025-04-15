@@ -28,6 +28,8 @@ import { Parameter } from '../entities/Parameter';
 import { TeamMembership } from '../entities/TeamMemberships';
 import { TeamInvite } from '../entities/TeamInvite';
 import { TeamJoinRequest } from '../entities/TeamJoinRequest';
+import { WishList } from '../entities/WishList';
+import { WishListEntry } from '../entities/WishListEntry';
 const options: DataSourceOptions & SeederOptions = {
   type: 'mysql',
   driver: mysql2,
@@ -37,7 +39,7 @@ const options: DataSourceOptions & SeederOptions = {
   password: process.env['DB_PASS'],
   database: process.env['DB_NAME'],
   synchronize: true,
-  logging: false,
+  logging: true,
   entities: [
     User,
     Student,
@@ -51,10 +53,12 @@ const options: DataSourceOptions & SeederOptions = {
     TeamMembership,
     TeamInvite,
     TeamJoinRequest,
+    WishList,
+    WishListEntry,
   ],
   subscribers: [],
   migrations: [],
-  dropSchema: false,
+  dropSchema: true,
   seeds: [UserSeeder, ProjectSeeder, ParameterSeeder],
   factories: [
     userFactory,
