@@ -14,6 +14,7 @@ import { ResourceNotFoundError } from '../errors/AppError';
 import { WishList } from '../entities/WishList';
 import { WishListEntry } from '../entities/WishListEntry';
 import { WishListEntryDTO } from '../dtos/projectDTOS';
+import { In } from 'typeorm';
 
 interface TeamDTO {
   name: string;
@@ -446,33 +447,68 @@ export const createWishList = async (
   try {
     const student = req.user.student;
 
+    // Validate team leader
     const team = await teamRepository.findOneOrFail({
       where: { teamLeader: { id: student.id } },
     });
 
-    const wishList = new WishList();
+    // Fetch all projects in a single query
+    const projectIds = req.body.map(entry => entry.project);
+    debugger;
+    const projects = await projectRepository.findBy({
+      id: In(projectIds),
+    });
+
+    debugger;
+    // Map projects by ID for quick lookup
+    const projectMap = new Map(projects.map(project => [project.id, project]));
+
+    // Create wish list entries
+    const wishListEntries: WishListEntry[] = [];
     for (const entry of req.body) {
+      const project = projectMap.get(entry.project);
+      if (!project) {
+        return res.status(400).send({
+          data: `Project with id ${entry.project} not found`,
+        });
+      }
+
+      if (project.specialty !== team.specialty) {
+        return res.status(400).send({
+          data: `Project with id ${project.id} : specialty does not match team specialty`,
+        });
+      }
+
       const wishListEntry = new WishListEntry();
-      const project = await projectRepository.findOneOrFail({
-        where: { id: entry.project }})
-        if (project.specialty != team.specialty) {
-          return res.status(400).send({
-            data: 'Project specialty does not match team specialty',
-          });
-        }
       wishListEntry.project = project;
       wishListEntry.priority = entry.priority;
-      wishList.entries.push(wishListEntry);
-      await wishListEntryRepository.save(wishListEntry);
+      wishListEntries.push(wishListEntry);
     }
 
-    wishList.team = team;
-    
+    // Check if the team already has a wish list
+    const existingWishList = await wishListRepository.findOne({
+      where: { team: { id: team.id } },
+      relations: { entries: true },
+    });
 
+    if (existingWishList) {
+      await wishListEntryRepository.delete({
+        wishList: { id: existingWishList.id },
+      });
+    }
+    // Create and save the wish list
+    const wishList = existingWishList || new WishList();
+    wishList.team = team;
+    wishList.entries = wishListEntries;
     await wishListRepository.save(wishList);
 
     res.status(200).send({ data: 'Wish list created successfully' });
-  } catch (e) {
-    res.status(500).send({ data: e });
+  } catch (e: any) {
+    if (e instanceof EntityNotFoundError) {
+      res.status(400).send({ data: e.message });
+    } else {
+      console.error(e); // Log the error for debugging
+      res.status(500).send({ data: 'Internal server error' });
+    }
   }
-}
+};

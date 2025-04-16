@@ -1,12 +1,13 @@
 import {
-    Column,
-    Entity,
-    PrimaryGeneratedColumn,
-    OneToOne,
-    BeforeInsert,
-    OneToMany,
-    ManyToOne,
-  } from 'typeorm';
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  BeforeInsert,
+  OneToMany,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 
 import { Team } from './Team';
 import { WishList } from './WishList';
@@ -17,7 +18,7 @@ export class WishListEntry {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => WishList, (wishList) => wishList.entries)
+  @ManyToOne(() => WishList, wishList => wishList.entries, { nullable: false })
   wishList: WishList;
 
   @ManyToOne(() => Project)

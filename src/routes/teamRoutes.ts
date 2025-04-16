@@ -9,6 +9,7 @@ import {
   acceptJoinRequest,
   declineInvite,
   declineJoinRequest,
+  createWishList,
 } from '../controllers/teamController';
 import { UserRole } from '../entities/User';
 
@@ -271,6 +272,49 @@ router.post(
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore
   declineJoinRequest,
+);
+
+/**
+ * @swagger
+ * /api/team/wishlist:
+ *   post:
+ *     summary: Create a wishlist for a team
+ *     tags: [Teams]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: array
+ *             items:
+ *               type: object
+ *               properties:
+ *                 project:
+ *                   type: integer
+ *                   description: The ID of the project
+ *                 priority:
+ *                   type: integer
+ *                   description: The priority of the project in the wishlist
+ *               required:
+ *                 - project
+ *                 - priority
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Wish list created successfully
+ *       400:
+ *         description: Bad request
+ *       500:
+ *         description: Internal server error
+ */
+
+router.post(
+  '/team/wishlist',
+  jwtFilter,
+  authorizeRoles([UserRole.STUDENT]),
+  // @ts-ignore
+  createWishList,
 );
 
 export default router;

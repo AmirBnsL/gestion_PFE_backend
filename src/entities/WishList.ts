@@ -1,12 +1,13 @@
 import {
-    Column,
-    Entity,
-    PrimaryGeneratedColumn,
-    OneToOne,
-    BeforeInsert,
-    OneToMany,
-    JoinColumn
-  } from 'typeorm';
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  BeforeInsert,
+  OneToMany,
+  JoinColumn,
+  Unique,
+} from 'typeorm';
 
 import { Team } from './Team';
 import { WishListEntry } from './WishListEntry';
@@ -16,11 +17,14 @@ export class WishList {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => Team, (team) => team.wishList)
+  @OneToOne(() => Team, team => team.wishList)
+  @JoinColumn()
   team: Team;
 
-  @OneToMany(() => WishListEntry, (entry) => entry.wishList, { cascade: true })
-  @JoinColumn()
+  @OneToMany(() => WishListEntry, entry => entry.wishList, {
+    cascade: true,
+    orphanedRowAction: 'delete',
+  })
   entries: WishListEntry[];
 
   @Column()
