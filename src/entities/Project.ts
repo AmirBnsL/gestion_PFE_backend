@@ -14,6 +14,7 @@ import { Team } from './Team';
 import Specialty from '../enums/specialty';
 import { Task } from './Task';
 import { SupervisorInvite } from './SupervisorInvite';
+import { ProjectSettings } from './ProjectSettings';
 
 export enum ProjectStatus {
   PROPOSED = 'proposed',
@@ -85,4 +86,7 @@ export class Project {
     this.createdAt = new Date();
     this.updatedAt = new Date();
   }
+
+  @OneToOne(() => ProjectSettings, projectSettings => projectSettings.project)
+  settings: ProjectSettings;
 }

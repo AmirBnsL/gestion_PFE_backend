@@ -6,6 +6,8 @@ import {
   createProject,
   getApprovedProjects,
   getProjectOverview,
+  sendProjectSupervisionByProject,
+  sendProjectSupervisionByTeacher,
 } from '../controllers/projectController';
 import {
   paginationSchema,
@@ -343,6 +345,70 @@ router.post(
   authorizeRoles([UserRole.ADMIN]),
   // @ts-ignore
   assignProjectToTeam,
+);
+
+/**
+ * @swagger
+ * /api/project/supervise/request/{projectId}:
+ *   post:
+ *     summary: Send a supervision request for a project
+ *     tags: [Projects]
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         description: ID of the project to supervise
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Supervision request sent successfully
+ *       400:
+ *         description: Invalid request parameters
+ *       401:
+ *         description: Unauthorized
+ */
+
+router.post(
+  '/project/supervise/request/:projectId',
+  jwtFilter,
+  authorizeRoles([UserRole.TEACHER]),
+  // @ts-ignore
+  sendProjectSupervisionByProject,
+);
+
+/**
+ * @swagger
+ * /api/project/supervise/invite/{teacherId}:
+ *   post:
+ *     summary: Send a supervision request to a teacher for a project as a proposer
+ *     tags: [Projects]
+ *     parameters:
+ *       - in: path
+ *         name: teacherId
+ *         required: true
+ *         description: ID of the target teacher
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Supervision invite sent successfully
+ *       400:
+ *         description: Invalid request parameters
+ *       401:
+ *         description: Unauthorized
+ */
+
+router.post(
+  '/project/supervise/invite/:teacherId',
+  jwtFilter,
+  authorizeRoles([UserRole.TEACHER]),
+  // @ts-ignore
+  sendProjectSupervisionByTeacher,
 );
 
 export default router;
