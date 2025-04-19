@@ -109,13 +109,12 @@ export const login = async (
   res: Response<ResponseDTO<string>>,
 ) => {
   const userRepository = AppDataSource.getRepository<User>('User');
-  debugger;
+
   try {
     const user = await userRepository.findOneByOrFail({
       email: req.body.email,
     });
     if (await bcrypt.compare(req.body.password, user.passwordHash)) {
-      debugger;
       const token = signJwt(user);
       res.status(200).send({ data: token });
       return;

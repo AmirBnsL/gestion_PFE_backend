@@ -13,6 +13,7 @@ import { Teacher } from './Teacher';
 import { Team } from './Team';
 import Specialty from '../enums/specialty';
 import { Task } from './Task';
+import { SupervisorInvite } from './SupervisorInvite';
 
 export enum ProjectStatus {
   PROPOSED = 'proposed',
@@ -63,6 +64,12 @@ export class Project {
 
   @OneToMany(() => Team, team => team.project)
   team: Team[];
+
+  @OneToMany(
+    () => SupervisorInvite,
+    supervisorInvite => supervisorInvite.project,
+  )
+  supervisorInvites: SupervisorInvite[];
 
   @Column()
   createdAt: Date;

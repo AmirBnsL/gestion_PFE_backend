@@ -20,6 +20,7 @@ import { options } from './configs/swaggerConfig';
 import teamRoutes from './routes/teamRoutes';
 import taskRoutes from './routes/taskRoutes';
 import { errorHandler } from './middleware/errorHandler';
+import studentRoutes from './routes/studentRoutes';
 
 AppDataSource.initialize()
   .then(async () => {
@@ -72,6 +73,7 @@ app.use('/api/', [
   announcementsRoutes,
   teamRoutes,
   taskRoutes,
+  studentRoutes,
 ]);
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TypeScript Server');

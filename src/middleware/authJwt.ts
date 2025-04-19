@@ -26,7 +26,6 @@ export interface JwtRequest<P = any, B = any, Q = any>
 }
 
 export const signJwt = (user: User) => {
-  debugger;
   console.log(user);
 
   const options: jwt.SignOptions = {

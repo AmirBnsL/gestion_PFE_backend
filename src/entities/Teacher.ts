@@ -1,14 +1,16 @@
 import {
   Column,
   Entity,
-  JoinColumn, ManyToOne,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
-  ManyToMany
+  ManyToMany,
 } from 'typeorm';
 import { User } from './User';
 import { Project } from './Project';
+import { SupervisorInvite } from './SupervisorInvite';
 
 export enum Rank {
   Assistant = 'Assistant',
@@ -59,4 +61,7 @@ export class Teacher {
 
   @ManyToMany(() => Project, project => project.supervisedBy)
   supervisedProjects: Project[];
+
+  @OneToMany(() => SupervisorInvite, invite => invite.supervisor)
+  supervisorInvites: SupervisorInvite[];
 }

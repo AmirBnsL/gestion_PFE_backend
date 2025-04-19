@@ -10,6 +10,9 @@ import {
   declineInvite,
   declineJoinRequest,
   createWishList,
+  getTeamLeaderRequests,
+  getTeamLeaderInvites,
+  getWishList,
 } from '../controllers/teamController';
 import { UserRole } from '../entities/User';
 
@@ -152,9 +155,9 @@ router.post(
 
 /**
  * @swagger
- * /api/team/request/accept/{studentId}:
+ * /api/team/request/accept/{requestId}:
  *   post:
- *     summary: Accept a join request by a the team leader
+ *     summary: Accept a join request by the team leader
  *     tags: [Teams]
  *     parameters:
  *       - in: path
@@ -162,7 +165,7 @@ router.post(
  *         schema:
  *           type: string
  *         required: true
- *         description: id of request sender
+ *         description: ID of the join request
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -174,7 +177,7 @@ router.post(
  */
 
 router.post(
-  '/team/request/accept/:studentId',
+  '/team/request/accept/:requestId',
   jwtFilter,
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore
@@ -183,7 +186,7 @@ router.post(
 
 /**
  * @swagger
- * /api/team/invite/accept/{teamId}:
+ * /api/team/invite/accept/{requestId}:
  *   post:
  *     summary: Accept an invitation to join a team
  *     tags: [Teams]
@@ -193,7 +196,7 @@ router.post(
  *         schema:
  *           type: string
  *         required: true
- *         description: The ID of the team
+ *         description: id of the invitation
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -205,7 +208,7 @@ router.post(
  */
 
 router.post(
-  '/team/invite/accept/:teamId',
+  '/team/invite/accept/:requestId',
   jwtFilter,
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore
@@ -214,17 +217,17 @@ router.post(
 
 /**
  * @swagger
- * /api/team/invite/reject/{teamId}:
+ * /api/team/invite/reject/{requestId}:
  *   post:
  *     summary: Reject an invitation to join a team
  *     tags: [Teams]
  *     parameters:
  *       - in: path
- *         name: teamId
+ *         name: requestId
  *         schema:
  *           type: string
  *         required: true
- *         description: The ID of the team
+ *         description: id of the invitation
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -236,7 +239,7 @@ router.post(
  */
 
 router.post(
-  '/team/invite/decline/:teamId',
+  '/team/invite/decline/:requestId',
   jwtFilter,
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore
@@ -245,17 +248,17 @@ router.post(
 
 /**
  * @swagger
- * /api/team/request/decline/{studentId}:
+ * /api/team/request/decline/{requestId}:
  *   post:
- *     summary: Decline a join request by a the team leader
+ *     summary: Decline a join request by the team leader
  *     tags: [Teams]
  *     parameters:
  *       - in: path
- *         name: studentId
+ *         name: requestId
  *         schema:
  *           type: string
  *         required: true
- *         description: id of request sender
+ *         description: request id of join request
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -267,7 +270,7 @@ router.post(
  */
 
 router.post(
-  '/team/request/decline/:studentId',
+  '/team/request/decline/:requestId',
   jwtFilter,
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore
@@ -317,4 +320,106 @@ router.post(
   createWishList,
 );
 
+/**
+ * @swagger
+ * /api/team/requests:
+ *   get:
+ *     summary: Get all join requests for this leader's team
+ *     tags: [Teams]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: An array of join requests
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/TeamJoinRequest'
+ *       403:
+ *         description: Unauthorized
+ *       400:
+ *         description: student not found
+ *       409:
+ *         description: not team leader
+ *       500:
+ *         description: Internal server error
+ */
+
+router.get(
+  '/team/requests',
+  jwtFilter,
+  authorizeRoles([UserRole.STUDENT]),
+  // @ts-ignore
+  getTeamLeaderRequests,
+);
+
+/**
+ * @swagger
+ * /api/team/invites:
+ *   get:
+ *     summary: Get all invites sent by this team
+ *     tags: [Teams]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: An array of invites
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/TeamInvite'
+ *       403:
+ *         description: Unauthorized
+ *       409:
+ *         description: not team leader
+ *       400:
+ *         description: student not found
+ *       500:
+ *         description: Internal server error
+ */
+
+router.get(
+  '/team/invites',
+  jwtFilter,
+  authorizeRoles([UserRole.STUDENT]),
+  // @ts-ignore
+  getTeamLeaderInvites,
+);
+
+/**
+ * @swagger
+ * /api/team/wishlist:
+ *   get:
+ *     summary: Get the wishlist of the team
+ *     tags: [Teams]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: An array of projects in the wishlist
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Project'
+ *       403:
+ *         description: Unauthorized
+ *       400:
+ *         description: student not found
+ *       500:
+ *         description: Internal server error
+ */
+
+router.get(
+  '/team/wishlist',
+  jwtFilter,
+  authorizeRoles([UserRole.STUDENT]),
+  // @ts-ignore
+  getWishList,
+);
 export default router;

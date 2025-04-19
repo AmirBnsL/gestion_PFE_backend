@@ -6,6 +6,8 @@ import { JwtRequest } from '../middleware/authJwt';
 import { ProjectDTORequest } from '../dtos/projectDTOS';
 import { Team } from '../entities/Team';
 import { EntityNotFoundError } from 'typeorm';
+import { SupervisorInvite } from '../entities/SupervisorInvite';
+import { Teacher } from '../entities/Teacher';
 
 const getProjectOverview = async (
   req: Request<{ projectId: string }>,
@@ -79,6 +81,115 @@ const assignProjectToTeam = async (
     if (error instanceof EntityNotFoundError) {
       res.status(404).send({ message: 'Project not found' });
     }
+  }
+};
+
+const handleProjectSupervision = async (
+  req: JwtRequest<{ projectId: string }>,
+  res: Response,
+  initiator: 'teacher' | 'proposer',
+) => {
+  const projectRepository = AppDataSource.getRepository(Project);
+  const supervisorInviteRepository =
+    AppDataSource.getRepository(SupervisorInvite);
+  const teacherRepository = AppDataSource.getRepository(Teacher);
+
+  try {
+    const user = req.user;
+    const teacher = await teacherRepository.findOneOrFail({
+      where: { id: user.teacher.id },
+      relations: ['supervisedProjects'],
+    });
+
+    if (teacher.supervisedProjects) {
+      for (const project of teacher.supervisedProjects) {
+        if (project.id === parseInt(req.params.projectId)) {
+          return res
+            .status(400)
+            .send({ message: 'Already supervising this project' });
+        }
+      }
+    }
+
+    const project = await projectRepository.findOneOrFail({
+      where: { id: parseInt(req.params.projectId) },
+    });
+
+    const request = new SupervisorInvite();
+    request.project = project;
+    request.supervisor = teacher;
+    request.status = 'pending';
+    request.initiator = initiator;
+
+    await supervisorInviteRepository.save(request);
+    res.status(201).send({ message: 'Supervision request sent successfully' });
+  } catch (e) {
+    console.error(e);
+    res.status(500).send({ message: 'Internal server error' });
+  }
+};
+
+const sendProjectSupervisionRequest = async (
+  req: JwtRequest<{ projectId: string }>,
+  res: Response,
+) => {
+  await handleProjectSupervision(req, res, 'teacher');
+};
+
+const sendProjectSupervisionInvite = async (
+  req: JwtRequest<{ projectId: string }>,
+  res: Response,
+) => {
+  await handleProjectSupervision(req, res, 'proposer');
+};
+
+const acceptProjectSupervisionRequest = async (
+  req: JwtRequest<{ requestId: string }>,
+  res: Response,
+) => {
+  const supervisorInviteRepository =
+    AppDataSource.getRepository(SupervisorInvite);
+  const teacherRepository = AppDataSource.getRepository(Teacher);
+  const projectRepository = AppDataSource.getRepository(Project);
+
+  try {
+    const request = await supervisorInviteRepository.findOneOrFail({
+      where: { id: parseInt(req.params.requestId), status: 'pending' },
+      relations: ['project', 'supervisor'],
+    });
+
+    request.status = 'accepted';
+
+    const project = await projectRepository.findOneOrFail({
+      where: { id: request.project.id },
+      relations: ['supervisedBy'],
+    });
+
+    const teacher = await teacherRepository.findOneOrFail({
+      where: { id: request.supervisor.id },
+      relations: ['supervisedProjects'],
+    });
+
+    project.supervisedBy = project.supervisedBy || [];
+    teacher.supervisedProjects = teacher.supervisedProjects || [];
+
+    // Optional: check if already supervising
+    if (!project.supervisedBy.find(t => t.id === teacher.id)) {
+      project.supervisedBy.push(teacher);
+    }
+
+    if (!teacher.supervisedProjects.find(p => p.id === project.id)) {
+      teacher.supervisedProjects.push(project);
+    }
+
+    await projectRepository.save(project);
+    await teacherRepository.save(teacher);
+    await supervisorInviteRepository.save(request);
+
+    res.status(200).send({ message: 'Request accepted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Internal server error' });
   }
 };
 

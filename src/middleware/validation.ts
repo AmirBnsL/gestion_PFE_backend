@@ -77,7 +77,6 @@ export const userLoginSchema = z.object({
 export function validateBody(schema: z.ZodObject<any, any>) {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
-      debugger;
       schema.parse(req.body);
       next();
     } catch (error) {
