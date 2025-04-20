@@ -10,6 +10,9 @@ import {
   sendProjectSupervisionByTeacher,
   acceptProjectSupervisionInviteAsTeacher,
   acceptProjectSupervisionInviteAsProposer,
+  getTeamJoinProjectRequestsForProject,
+  acceptTeamProjectRequest,
+  declineTeamProjectRequest,
 } from '../controllers/projectController';
 import {
   paginationSchema,
@@ -23,6 +26,7 @@ import {
   getProjects,
   rejectProject,
 } from '../controllers/adminController';
+import jwt from 'jsonwebtoken';
 
 const router = Router();
 /**
@@ -475,6 +479,103 @@ router.post(
   authorizeRoles([UserRole.TEACHER]),
   // @ts-ignore
   acceptProjectSupervisionInviteAsProposer,
+);
+
+/**
+ * @swagger
+ * /api/project/team/requests:
+ *   get:
+ *     summary: Get all team join project requests for a project
+ *     tags: [Projects]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: A list of team join project requests
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Project'
+ *       400:
+ *         description: Invalid request parameters
+ *       401:
+ *         description: Unauthorized
+ */
+
+router.get(
+  '/project/team/requests',
+  jwtFilter,
+  authorizeRoles([UserRole.TEACHER]),
+  // @ts-ignore
+  getTeamJoinProjectRequestsForProject,
+);
+
+/**
+ * @swagger
+ * /api/project/team/request/accept/{requestId}:
+ *   post:
+ *     summary: Accept a team join project request
+ *     tags: [Projects]
+ *     parameters:
+ *       - in: path
+ *         name: requestId
+ *         required: true
+ *         description: ID of the team join project request
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: request accepted successfully
+ *       400:
+ *         description: Invalid request parameters
+ *       401:
+ *         description: Unauthorized
+ */
+
+router.post(
+  '/project/team/request/accept/:requestId',
+  jwtFilter,
+  authorizeRoles([UserRole.TEACHER]),
+  // @ts-ignore
+  acceptTeamProjectRequest,
+);
+
+/**
+ * @swagger
+ * /api/project/team/request/decline/{requestId}:
+ *   post:
+ *     summary: Decline a team join project request
+ *     tags: [Projects]
+ *     parameters:
+ *       - in: path
+ *         name: requestId
+ *         required: true
+ *         description: ID of the team join project request
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: request declined successfully
+ *       400:
+ *         description: Invalid request parameters
+ *       401:
+ *         description: Unauthorized
+ */
+router.post(
+  '/project/team/request/decline/:requestId',
+  jwtFilter,
+  authorizeRoles([UserRole.TEACHER]),
+  // @ts-ignore
+  declineTeamProjectRequest,
 );
 
 export default router;

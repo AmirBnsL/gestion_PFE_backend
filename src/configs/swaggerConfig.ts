@@ -174,6 +174,25 @@ const TeamSchema = {
   },
 };
 
+const TeamJoinProjectRequestSchema = {
+  type: 'object',
+  properties: {
+    id: { type: 'number' },
+    team: { $ref: '#/components/schemas/Team' },
+    project: { $ref: '#/components/schemas/Project' },
+    status: {
+      type: 'string',
+      enum: ['pending', 'accepted', 'declined'],
+    },
+    createdAt: { type: 'string', format: 'date-time' },
+    updatedAt: { type: 'string', format: 'date-time' },
+    initiator: {
+      type: 'string',
+      enum: ['student', 'teamLeader'],
+    },
+  },
+};
+
 // Main Swagger configuration
 export const options = {
   definition: {
@@ -200,6 +219,7 @@ export const options = {
         TeamInvite: TeamInviteSchema,
         SupervisorInvite: SupervisorInviteSchema,
         Team: TeamSchema,
+        TeamJoinProjectRequest: TeamJoinProjectRequestSchema,
       },
     },
     security: [

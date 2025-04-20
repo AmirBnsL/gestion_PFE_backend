@@ -245,9 +245,7 @@ const acceptProjectSupervisionRequest = async (
     });
 
     if (initiator === 'teacher') {
-      if (project?.proposedBy?.user?.id != req.user.id) {
-        return res.status(403).send({ message: 'User is not the proposer' });
-      }
+      if (project) can(req.user.teacher, res).propose(project);
     }
 
     if (!project) {
@@ -305,9 +303,8 @@ export const sendTeamProjectRequest = async (
     if (!student) {
       return res.status(404).send({ message: 'Student not found' });
     }
-    if (student.teamMembership.team.teamLeader !== student) {
-      return res.status(403).send({ message: 'User is not the team leader' });
-    }
+    can(student, res).lead(student.teamMembership.team);
+
     if (student.teamMembership.team.project) {
       return res.status(400).send({ message: 'Team already has a project' });
     }
@@ -352,11 +349,7 @@ export const declineTeamProjectRequest = async (
       return res.status(404).send({ message: 'Request not found' });
     }
 
-    if (request.project.proposedBy.id !== user.teacher.id) {
-      return res.status(403).send({
-        message: 'User is not the project proposer to accept the request',
-      });
-    }
+    can(user.teacher, res).propose(request.project);
 
     request.status = 'declined';
     await teamJoinProjectRequestRepository.save(request);
@@ -389,11 +382,7 @@ export const acceptTeamProjectRequest = async (
       return res.status(404).send({ message: 'Request not found' });
     }
 
-    if (request.project.proposedBy.id !== user.teacher.id) {
-      return res.status(403).send({
-        message: 'User is not the project proposer to accept the request',
-      });
-    }
+    can(user.teacher, res).propose(request.project);
 
     request.status = 'accepted';
     await teamJoinProjectRequestRepository.save(request);
@@ -434,6 +423,67 @@ export const can = (user: any, res: Response) => ({
     }
   },
 });
+
+export const getTeamJoinProjectRequestsForTeam = async (
+  req: JwtRequest,
+  res: Response,
+) => {
+  const teamJoinProjectRequestRepository = AppDataSource.getRepository(
+    TeamJoinProjectRequest,
+  );
+  const studentRepository = AppDataSource.getRepository(Student);
+
+  try {
+    const user = req.user;
+    const student = await studentRepository.findOne({
+      where: { user: { id: user.id } },
+      relations: { teamMembership: { team: true } },
+    });
+    if (!student) {
+      return res.status(404).send({ message: 'Student not found' });
+    }
+    can(student, res).lead(student.teamMembership.team);
+
+    const requests = await teamJoinProjectRequestRepository.find({
+      where: { team: student.teamMembership.team },
+      relations: ['project', 'team'],
+    });
+
+    return res.status(200).send({ data: requests });
+  } catch (error) {
+    console.error(error);
+    throw new Error('Internal server error');
+  }
+};
+
+export const getTeamJoinProjectRequestsForProject = async (
+  req: JwtRequest<{ projectId: string }>,
+  res: Response,
+) => {
+  const projectRepository = AppDataSource.getRepository(Project);
+
+  try {
+    const user = req.user;
+    const project = await projectRepository.findOne({
+      where: { id: parseInt(req.params.projectId) },
+      relations: {
+        teamJoinProjectRequests: { project: true, team: true },
+        proposedBy: true,
+      },
+    });
+    if (!project) {
+      return res.status(404).send({ message: 'project not found' });
+    }
+    can(user.teacher, res).propose(project);
+
+    const requests = project.teamJoinProjectRequests;
+
+    return res.status(200).send({ data: requests });
+  } catch (error) {
+    console.error(error);
+    throw new Error('Internal server error');
+  }
+};
 
 export {
   assignProjectToTeam,

@@ -15,6 +15,10 @@ import {
   getWishList,
 } from '../controllers/teamController';
 import { UserRole } from '../entities/User';
+import {
+  getTeamJoinProjectRequestsForTeam,
+  sendTeamProjectRequest,
+} from '../controllers/projectController';
 
 const router = Router();
 
@@ -422,4 +426,71 @@ router.get(
   // @ts-ignore
   getWishList,
 );
+
+/**
+ * @swagger
+ * /api/team/project/request/{projectId}:
+ *   post:
+ *     summary: Request to join a project
+ *     tags: [Teams]
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the project
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Request sent successfully
+ *       404:
+ *         description: Project not found/Team has already a project/student not found
+ *
+ */
+
+router.post(
+  '/team/project/request/:projectId',
+  jwtFilter,
+  authorizeRoles([UserRole.STUDENT]),
+  // @ts-ignore
+  sendTeamProjectRequest,
+);
+
+/**
+ * @swagger
+ * /api/team/project/requests:
+ *   get:
+ *     summary: Get all project join requests for this leader's team
+ *     tags: [Teams]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: An array of project join requests
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/TeamJoinProjectRequest'
+ *       403:
+ *         description: Unauthorized
+ *       400:
+ *         description: student not found
+ *       409:
+ *         description: not team leader
+ *       500:
+ *         description: Internal server error
+ */
+
+router.get(
+  '/team/project/requests',
+  jwtFilter,
+  authorizeRoles([UserRole.STUDENT]),
+  // @ts-ignore
+  getTeamJoinProjectRequestsForTeam,
+);
+
 export default router;
