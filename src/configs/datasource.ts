@@ -32,6 +32,7 @@ import { WishList } from '../entities/WishList';
 import { WishListEntry } from '../entities/WishListEntry';
 import { SupervisorInvite } from '../entities/SupervisorInvite';
 import { ProjectSettings } from '../entities/ProjectSettings';
+import { TeamJoinProjectRequest } from '../entities/TeamJoinProjectRequest';
 const options: DataSourceOptions & SeederOptions = {
   type: 'mysql',
   driver: mysql2,
@@ -59,6 +60,7 @@ const options: DataSourceOptions & SeederOptions = {
     WishListEntry,
     SupervisorInvite,
     ProjectSettings,
+    TeamJoinProjectRequest,
   ],
   subscribers: [],
   migrations: [],

@@ -15,6 +15,7 @@ import Specialty from '../enums/specialty';
 import { Task } from './Task';
 import { SupervisorInvite } from './SupervisorInvite';
 import { ProjectSettings } from './ProjectSettings';
+import { TeamJoinProjectRequest } from './TeamJoinProjectRequest';
 
 export enum ProjectStatus {
   PROPOSED = 'proposed',
@@ -80,6 +81,12 @@ export class Project {
 
   @Column()
   rejectionReason: string;
+
+  @OneToMany(
+    () => TeamJoinProjectRequest,
+    teamJoinProjectRequest => teamJoinProjectRequest.project,
+  )
+  teamJoinProjectRequests: TeamJoinProjectRequest[];
 
   @BeforeInsert()
   setDates() {

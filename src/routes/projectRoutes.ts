@@ -8,6 +8,8 @@ import {
   getProjectOverview,
   sendProjectSupervisionByProject,
   sendProjectSupervisionByTeacher,
+  acceptProjectSupervisionInviteAsTeacher,
+  acceptProjectSupervisionInviteAsProposer,
 } from '../controllers/projectController';
 import {
   paginationSchema,
@@ -409,6 +411,70 @@ router.post(
   authorizeRoles([UserRole.TEACHER]),
   // @ts-ignore
   sendProjectSupervisionByTeacher,
+);
+
+/**
+ * @swagger
+ * /api/project/supervise/invite/accept/{requestId}:
+ *   post:
+ *     summary: Accept a supervision invite as a teacher
+ *     tags: [Projects]
+ *     parameters:
+ *       - in: path
+ *         name: requestId
+ *         required: true
+ *         description: ID of the supervision invite request
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Supervision invite accepted successfully
+ *       400:
+ *         description: Invalid request parameters
+ *       401:
+ *         description: Unauthorized
+ */
+
+router.post(
+  '/project/supervise/invite/accept/:requestId',
+  jwtFilter,
+  authorizeRoles([UserRole.TEACHER]),
+  // @ts-ignore
+  acceptProjectSupervisionInviteAsTeacher,
+);
+
+/**
+ * @swagger
+ * /api/project/supervise/request/accept/{requestId}:
+ *   post:
+ *     summary: Accept a supervision invite as a proposer
+ *     tags: [Projects]
+ *     parameters:
+ *       - in: path
+ *         name: requestId
+ *         required: true
+ *         description: ID of the supervision invite request
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Supervision invite accepted successfully
+ *       400:
+ *         description: Invalid request parameters
+ *       401:
+ *         description: Unauthorized
+ */
+
+router.post(
+  '/project/supervise/request/accept/:requestId',
+  jwtFilter,
+  authorizeRoles([UserRole.TEACHER]),
+  // @ts-ignore
+  acceptProjectSupervisionInviteAsProposer,
 );
 
 export default router;

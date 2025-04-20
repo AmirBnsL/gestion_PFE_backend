@@ -5,9 +5,11 @@ import { PageQuery, ResponseDTO } from '../dtos/genericDTOs';
 import { JwtRequest } from '../middleware/authJwt';
 import { ProjectDTORequest } from '../dtos/projectDTOS';
 import { Team } from '../entities/Team';
-import { EntityNotFoundError, Repository } from 'typeorm';
+import { EntityNotFoundError } from 'typeorm';
 import { SupervisorInvite } from '../entities/SupervisorInvite';
 import { Teacher } from '../entities/Teacher';
+import { Student } from '../entities/Student';
+import { TeamJoinProjectRequest } from '../entities/TeamJoinProjectRequest';
 
 const getProjectOverview = async (
   req: Request<{ projectId: string }>,
@@ -220,11 +222,14 @@ const acceptProjectSupervisionRequest = async (
 
   try {
     const request = await supervisorInviteRepository.findOne({
-      where: {
-        id: parseInt(req.params.requestId),
-        status: 'pending',
-        initiator: initiator,
-      },
+      where: [
+        {
+          id: parseInt(req.params.requestId),
+          status: 'pending',
+          initiator: initiator,
+        },
+        {},
+      ],
       relations: ['project', 'supervisor'],
     });
 
@@ -238,6 +243,12 @@ const acceptProjectSupervisionRequest = async (
       where: { id: request.project.id },
       relations: ['supervisedBy'],
     });
+
+    if (initiator === 'teacher') {
+      if (project?.proposedBy?.user?.id != req.user.id) {
+        return res.status(403).send({ message: 'User is not the proposer' });
+      }
+    }
 
     if (!project) {
       return res.status(404).send({ message: 'Project not found' });
@@ -273,6 +284,156 @@ const acceptProjectSupervisionRequest = async (
     res.status(500).send({ message: 'Internal server error' });
   }
 };
+
+export const sendTeamProjectRequest = async (
+  req: JwtRequest<{ projectId: string }>,
+  res: Response,
+) => {
+  const projectRepository = AppDataSource.getRepository(Project);
+  const studentRepository = AppDataSource.getRepository(Student);
+  const teamJoinProjectRequestRepository = AppDataSource.getRepository(
+    TeamJoinProjectRequest,
+  );
+  try {
+    const user = req.user;
+    const student = await studentRepository.findOne({
+      where: { user: { id: user.id } },
+      relations: {
+        teamMembership: { team: { teamLeader: true, project: true } },
+      },
+    });
+    if (!student) {
+      return res.status(404).send({ message: 'Student not found' });
+    }
+    if (student.teamMembership.team.teamLeader !== student) {
+      return res.status(403).send({ message: 'User is not the team leader' });
+    }
+    if (student.teamMembership.team.project) {
+      return res.status(400).send({ message: 'Team already has a project' });
+    }
+
+    const project = await projectRepository.findOne({
+      where: { id: parseInt(req.params.projectId) },
+      relations: ['team'],
+    });
+    if (!project) {
+      return res.status(404).send({ message: 'Project not found' });
+    }
+    const teamJoinProjectRequest = new TeamJoinProjectRequest();
+    teamJoinProjectRequest.project = project;
+    teamJoinProjectRequest.team = student.teamMembership.team;
+    teamJoinProjectRequest.status = 'pending';
+    teamJoinProjectRequest.initiator = 'student';
+
+    await teamJoinProjectRequestRepository.save(teamJoinProjectRequest);
+    res.status(200).send({ message: 'Request sent successfully' });
+  } catch (e) {
+    console.error(e);
+    res.status(500).send({ message: 'Internal server error' });
+  }
+};
+
+export const declineTeamProjectRequest = async (
+  req: JwtRequest<{ requestId: string }>,
+  res: Response,
+) => {
+  const teamJoinProjectRequestRepository = AppDataSource.getRepository(
+    TeamJoinProjectRequest,
+  );
+  try {
+    const user = req.user;
+
+    const request = await teamJoinProjectRequestRepository.findOne({
+      where: { id: parseInt(req.params.requestId), status: 'pending' },
+      relations: { project: { proposedBy: true } },
+    });
+
+    if (!request) {
+      return res.status(404).send({ message: 'Request not found' });
+    }
+
+    if (request.project.proposedBy.id !== user.teacher.id) {
+      return res.status(403).send({
+        message: 'User is not the project proposer to accept the request',
+      });
+    }
+
+    request.status = 'declined';
+    await teamJoinProjectRequestRepository.save(request);
+
+    res.status(200).send({ message: 'Request declined successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Internal server error' });
+  }
+};
+
+export const acceptTeamProjectRequest = async (
+  req: JwtRequest<{ requestId: string }>,
+  res: Response,
+) => {
+  const teamJoinProjectRequestRepository = AppDataSource.getRepository(
+    TeamJoinProjectRequest,
+  );
+  const projectRepository = AppDataSource.getRepository(Project);
+  const teamRepository = AppDataSource.getRepository(Team);
+  try {
+    const user = req.user;
+
+    const request = await teamJoinProjectRequestRepository.findOne({
+      where: { id: parseInt(req.params.requestId), status: 'pending' },
+      relations: { project: { proposedBy: true }, team: true },
+    });
+
+    if (!request) {
+      return res.status(404).send({ message: 'Request not found' });
+    }
+
+    if (request.project.proposedBy.id !== user.teacher.id) {
+      return res.status(403).send({
+        message: 'User is not the project proposer to accept the request',
+      });
+    }
+
+    request.status = 'accepted';
+    await teamJoinProjectRequestRepository.save(request);
+
+    const project = await projectRepository.findOneOrFail({
+      where: { id: request.project.id },
+      relations: ['team'],
+    });
+
+    const team = await teamRepository.findOneOrFail({
+      where: { id: request.team.id },
+      relations: ['students'],
+    });
+
+    project.team.push(team);
+    await projectRepository.save(project);
+
+    res.status(200).send({ message: 'Request accepted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Internal server error' });
+  }
+};
+
+export const can = (user: any, res: Response) => ({
+  propose: (project: Project): void => {
+    if (user?.teacher?.id !== project.proposedBy?.id) {
+      res
+        .status(403)
+        .send({ message: 'You are not the proposer of this project' });
+      throw new Error('Forbidden');
+    }
+  },
+  lead: (team: Team): void => {
+    if (user?.student?.id !== team.teamLeader?.id) {
+      res.status(403).send({ message: 'You are not the leader of this team' });
+      throw new Error('Forbidden');
+    }
+  },
+});
 
 export {
   assignProjectToTeam,
