@@ -22,7 +22,7 @@ export class TeamInvite {
   @Column({ default: 'pending' })
   status: 'pending' | 'accepted' | 'declined';
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   initiator: 'student' | 'teamLeader';
 
   @CreateDateColumn()

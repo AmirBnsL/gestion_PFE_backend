@@ -37,7 +37,7 @@ const router = Router();
  */
 
 router.get(
-  'student/invites',
+  '/student/invites',
   jwtFilter,
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore
@@ -73,7 +73,7 @@ router.get(
  */
 
 router.get(
-  'student/requests',
+  '/student/requests',
   jwtFilter,
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore

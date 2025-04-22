@@ -102,6 +102,7 @@ export const createTeam = async (
 };
 
 //done by team leader
+//TODO: fix error handling when you are querying without a team
 export const sendInvite = async (
   req: JwtRequest<{ email: string }>,
   res: Response,
@@ -120,7 +121,7 @@ export const sendInvite = async (
       },
     });
 
-    const team = senderStudent.teamMembership.team;
+    const team = senderStudent.teamMembership?.team;
     if (!team) {
       return res.status(404).send({ data: 'Team not found' });
     }
@@ -659,5 +660,31 @@ export const getWishList = async (
     } else {
       res.status(500).send({ data: 'Internal server error' });
     }
+  }
+};
+
+export const getMyTeam = async (req: JwtRequest, res: Response) => {
+  const teamRepository = AppDataSource.getRepository(Team);
+  const studentRepository = AppDataSource.getRepository(Student);
+
+  try {
+    const user = req.user;
+
+    const student = await studentRepository.findOne({
+      where: {
+        user: { id: user.id },
+      },
+      relations: {
+        teamMembership: { team: true },
+      },
+    });
+
+    if (!student) {
+      return res.status(404).send({ data: 'Student not found' });
+    }
+
+    return res.status(200).send({ data: student.teamMembership.team });
+  } catch (e) {
+    res.status(500).send({ data: 'Internal server error' });
   }
 };

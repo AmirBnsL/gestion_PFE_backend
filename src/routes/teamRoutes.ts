@@ -13,6 +13,7 @@ import {
   getTeamLeaderRequests,
   getTeamLeaderInvites,
   getWishList,
+  getMyTeam,
 } from '../controllers/teamController';
 import { UserRole } from '../entities/User';
 import {
@@ -205,7 +206,7 @@ router.post(
  *     tags: [Teams]
  *     parameters:
  *       - in: path
- *         name: teamId
+ *         name: requestId
  *         schema:
  *           type: string
  *         required: true
@@ -502,6 +503,38 @@ router.get(
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore
   getTeamJoinProjectRequestsForTeam,
+);
+
+/**
+ * @swagger
+ * /api/team:
+ *   get:
+ *     summary: Get the team of the currently authenticated student
+ *     tags: [Teams]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: The team of the student
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   $ref: '#/components/schemas/Team'
+ *       403:
+ *         description: Unauthorized
+ *       400:
+ *         description: student not found
+ */
+
+router.get(
+  '/team',
+  jwtFilter,
+  authorizeRoles([UserRole.STUDENT]),
+  // @ts-ignore
+  getMyTeam,
 );
 
 export default router;

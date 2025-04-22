@@ -34,6 +34,7 @@ AppDataSource.initialize()
 
     if (process.env['MODE'] == 'POPULATE') {
       await populateDatabase(AppDataSource);
+      await runSeeders(AppDataSource);
     }
     const userRepository = AppDataSource.getRepository(User);
     const adminRepository = AppDataSource.getRepository(Admin);
