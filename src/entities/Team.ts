@@ -56,6 +56,8 @@ export class Team {
   )
 
   // Wish list of preferred projects
+
+  //TODO: wishlist must when admin allows it through parameters
   @OneToOne(() => WishList, wishList => wishList.team, { cascade: true })
   wishList: WishList;
 }

@@ -19,6 +19,11 @@ import {
   getTeamJoinProjectRequestsForTeam,
   sendTeamProjectRequest,
 } from '../controllers/projectController';
+import {
+  ifAllowedTeamCreation,
+  ifAllowedTeamJoining,
+  ifAllowedWishListCreation,
+} from '../middleware/parametersMiddlewares';
 
 const router = Router();
 
@@ -90,6 +95,7 @@ router.post(
   jwtFilter,
   authorizeRoles([UserRole.ADMIN, UserRole.STUDENT]),
   // @ts-ignore
+  ifAllowedTeamCreation,
   createTeam,
 );
 
@@ -123,6 +129,7 @@ router.post(
   jwtFilter,
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore
+  ifAllowedTeamJoining,
   sendInvite,
 );
 
@@ -154,6 +161,7 @@ router.post(
   jwtFilter,
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore
+  ifAllowedTeamJoining,
   requestTeam,
 );
 
@@ -185,6 +193,7 @@ router.post(
   jwtFilter,
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore
+  ifAllowedTeamJoining,
   acceptJoinRequest,
 );
 
@@ -216,12 +225,13 @@ router.post(
   jwtFilter,
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore
+  ifAllowedTeamJoining,
   acceptInvite,
 );
 
 /**
  * @swagger
- * /api/team/invite/reject/{requestId}:
+ * /api/team/invite/decline/{requestId}:
  *   post:
  *     summary: Reject an invitation to join a team
  *     tags: [Teams]
@@ -321,6 +331,7 @@ router.post(
   jwtFilter,
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore
+  ifAllowedWishListCreation,
   createWishList,
 );
 

@@ -64,7 +64,7 @@ const options: DataSourceOptions & SeederOptions = {
   ],
   subscribers: [],
   migrations: [],
-  dropSchema: false,
+  dropSchema: true,
   seeds: [UserSeeder, ProjectSeeder, ParameterSeeder],
   factories: [
     userFactory,

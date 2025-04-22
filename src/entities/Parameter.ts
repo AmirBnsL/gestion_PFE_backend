@@ -11,6 +11,12 @@ export class Parameter {
   @Column()
   allowTeamCreation: boolean;
 
+  @Column()
+  allowTeamJoining: boolean;
+
+  @Column()
+  allowWishListCreation: boolean;
+
   @Column({
     type: 'enum',
     enum: AcademicYear,

@@ -66,11 +66,6 @@ export const createTeam = async (
     const parameters = await parameterRepository.findOneOrFail({
       where: { year: student.academicYear },
     });
-    if (!parameters.allowTeamCreation) {
-      return res.status(400).send({
-        message: 'Team creation is not allowed for this academic year',
-      });
-    }
 
     const teamMembershipRepository =
       AppDataSource.getRepository(TeamMembership);
@@ -191,17 +186,21 @@ export const requestTeam = async (
   req: JwtRequest<{ teamId: string }>,
   res: Response,
 ) => {
-  const parameterRepository = AppDataSource.getRepository(Parameter);
   const teamRepository = AppDataSource.getRepository(Team);
   const teamJoinRequestRepository =
     AppDataSource.getRepository(TeamJoinRequest);
+  const parameter = await AppDataSource.getRepository(Parameter).findOneOrFail({
+    where: { year: req.user.student.academicYear },
+  });
 
   try {
-    const parameter = await parameterRepository.findOneOrFail({
-      where: { year: req.user.student.academicYear },
-    });
-
     const student = req.user.student;
+
+    const parameter = await AppDataSource.getRepository(
+      Parameter,
+    ).findOneOrFail({
+      where: { year: student.academicYear },
+    });
 
     if (student.teamMembership) {
       return { status: 400, message: 'Student already has a team' };

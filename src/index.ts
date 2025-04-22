@@ -21,6 +21,7 @@ import teamRoutes from './routes/teamRoutes';
 import taskRoutes from './routes/taskRoutes';
 import { errorHandler } from './middleware/errorHandler';
 import studentRoutes from './routes/studentRoutes';
+import populateDatabase from './dataloader/populateDB';
 
 AppDataSource.initialize()
   .then(async () => {
@@ -29,6 +30,10 @@ AppDataSource.initialize()
 
     if (process.env['MODE'] == 'SEED') {
       await runSeeders(AppDataSource);
+    }
+
+    if (process.env['MODE'] == 'POPULATE') {
+      await populateDatabase(AppDataSource);
     }
     const userRepository = AppDataSource.getRepository(User);
     const adminRepository = AppDataSource.getRepository(Admin);
