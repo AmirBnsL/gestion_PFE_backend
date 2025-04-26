@@ -33,7 +33,7 @@ import { WishListEntry } from '../entities/WishListEntry';
 import { SupervisorInvite } from '../entities/SupervisorInvite';
 import { ProjectSettings } from '../entities/ProjectSettings';
 import { TeamJoinProjectRequest } from '../entities/TeamJoinProjectRequest';
-import { FileUpload } from '../entities/File';
+import { FileUpload } from '../entities/FileUpload';
 const options: DataSourceOptions & SeederOptions = {
   type: 'mysql',
   driver: mysql2,

@@ -16,7 +16,7 @@ import { Task } from './Task';
 import { SupervisorInvite } from './SupervisorInvite';
 import { ProjectSettings } from './ProjectSettings';
 import { TeamJoinProjectRequest } from './TeamJoinProjectRequest';
-import { FileUpload } from './File';
+import { FileUpload } from './FileUpload';
 
 export enum ProjectStatus {
   PROPOSED = 'proposed',
@@ -80,7 +80,7 @@ export class Project {
   @Column()
   updatedAt: Date;
 
-  @Column()
+  @Column({ nullable: true })
   rejectionReason: string;
 
   @OneToMany(
@@ -93,6 +93,8 @@ export class Project {
   setDates() {
     this.createdAt = new Date();
     this.updatedAt = new Date();
+    this.startDate = new Date();
+    this.endDate = new Date();
   }
 
   @OneToOne(() => ProjectSettings, projectSettings => projectSettings.project)

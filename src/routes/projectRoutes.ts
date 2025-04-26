@@ -13,6 +13,9 @@ import {
   getTeamJoinProjectRequestsForProject,
   acceptTeamProjectRequest,
   declineTeamProjectRequest,
+  uploadProjectFile,
+  getProjectFilesLink,
+  downloadFileById,
 } from '../controllers/projectController';
 import {
   paginationSchema,
@@ -26,8 +29,9 @@ import {
   getProjects,
   rejectProject,
 } from '../controllers/adminController';
-import jwt from 'jsonwebtoken';
-
+import multer from 'multer';
+import { Request, Response } from 'express';
+import path from 'path';
 const router = Router();
 /**
  * @swagger
@@ -290,7 +294,7 @@ router.post(
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               title:
  *                 type: string
  *               description:
  *                 type: string
@@ -578,6 +582,124 @@ router.post(
   declineTeamProjectRequest,
 );
 
-router.post;
+const storage = multer.diskStorage({
+  destination: function (req: Request, file, cb: any) {
+    const projectRoot = path.resolve(__dirname, '../../');
+    cb(null, projectRoot + '/uploads/projectFiles'); // 1st arg = error (null means no error), 2nd = folder
+  },
+  filename: function (req: Request, file, cb) {
+    const uniqueName = Date.now() + '-' + file.originalname;
+    cb(null, uniqueName); // 1st arg = error, 2nd = new file name
+  },
+});
 
+const upload = multer({ storage: storage });
+
+/**
+ * @swagger
+ * /api/project/file/{projectId}:
+ *   post:
+ *     summary: Upload files for a project
+ *     tags: [Projects]
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         description: ID of the project to uploads files for
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               files:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       200:
+ *         description: Files uploaded successfully
+ *       400:
+ *         description: Invalid request parameters
+ *       401:
+ *         description: Unauthorized
+ */
+
+router.post(
+  '/project/file/:projectId',
+  jwtFilter,
+  authorizeRoles([UserRole.TEACHER]),
+  upload.array('files'),
+  // @ts-ignore
+  uploadProjectFile,
+);
+
+/**
+ * @swagger
+ * /api/project/file/{projectId}:
+ *   get:
+ *     summary: Download files for a project
+ *     tags: [Projects]
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         description: ID of the project to download files for
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: File downloaded successfully
+ *       400:
+ *         description: Invalid request parameters
+ *       401:
+ *         description: Unauthorized
+ */
+
+router.get(
+  '/project/file/:projectId',
+  jwtFilter,
+  authorizeRoles([UserRole.TEACHER]),
+  // @ts-ignore
+  getProjectFilesLink,
+);
+
+/**
+ * @swagger
+ * /api/project/file/download/{fileId}:
+ *   get:
+ *     summary: Download a file by ID
+ *     tags: [Projects]
+ *     parameters:
+ *       - in: path
+ *         name: fileId
+ *         required: true
+ *         description: ID of the file to download
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: File downloaded successfully
+ *       400:
+ *         description: Invalid request parameters
+ *       401:
+ *         description: Unauthorized
+ */
+router.get(
+  '/project/file/download/:fileId',
+  jwtFilter,
+  authorizeRoles([UserRole.TEACHER]),
+  // @ts-ignore
+  downloadFileById,
+);
 export default router;
