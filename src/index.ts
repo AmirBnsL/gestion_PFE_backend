@@ -79,8 +79,10 @@ app.use(express.json());
 app.use(morgan('dev'));
 app.use(
   cors({
-    origin: '*', // or use 'http://127.0.0.1:5500' for stricter security
-    methods: ['GET', 'POST'],
+    origin: 'http://localhost:3000', // Replace with your frontend's URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true, // Allow cookies if needed
   }),
 );
 

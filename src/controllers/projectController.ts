@@ -10,6 +10,8 @@ import { SupervisorInvite } from '../entities/SupervisorInvite';
 import { Teacher } from '../entities/Teacher';
 import { Student } from '../entities/Student';
 import { TeamJoinProjectRequest } from '../entities/TeamJoinProjectRequest';
+import { FileUpload } from '../entities/FileUpload';
+import path from 'path';
 
 const getProjectOverview = async (
   req: Request<{ projectId: string }>,
@@ -482,6 +484,107 @@ export const getTeamJoinProjectRequestsForProject = async (
   } catch (error) {
     console.error(error);
     throw new Error('Internal server error');
+  }
+};
+
+export const uploadProjectFile = async (
+  req: JwtRequest<{ projectId: string }>,
+  res: Response,
+) => {
+  const projectRepository = AppDataSource.getRepository(Project);
+  const fileUploadRepository = AppDataSource.getRepository(FileUpload);
+  try {
+    const user = req.user;
+    const project = await projectRepository.findOneOrFail({
+      where: { id: parseInt(req.params.projectId) },
+      relations: ['proposedBy', 'files'],
+    });
+    if (!project) {
+      return res.status(404).send({ message: 'Project not found' });
+    }
+    can(user, res).propose(project);
+
+    const files = req.files;
+    if (!files) {
+      return res.status(400).send({ message: 'File not found' });
+    }
+
+    if (!Array.isArray(files)) {
+      return res.status(400).send({ message: 'Invalid file format' });
+    }
+    for (const file of files) {
+      const fileUpload = new FileUpload();
+      fileUpload.name = file.filename;
+      fileUpload.link = file.path;
+      fileUpload.project = project;
+      project.files.push(fileUpload);
+      await fileUploadRepository.save(fileUpload);
+      await projectRepository.save(project);
+    }
+    res.status(200).send({ message: 'File uploaded successfully' });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).send({ message: 'Internal server error' });
+  }
+};
+
+export const getProjectFilesLink = async (
+  req: JwtRequest<{ projectId: string }>,
+  res: Response,
+) => {
+  const projectRepository = AppDataSource.getRepository(Project);
+  const fileUploadRepository = AppDataSource.getRepository(FileUpload);
+  try {
+    const project = await projectRepository.findOneOrFail({
+      where: { id: parseInt(req.params.projectId) },
+      relations: ['files'],
+    });
+    if (!project) {
+      return res.status(404).send({ message: 'Project not found' });
+    }
+    const files = project.files;
+    if (!files || files.length === 0) {
+      return res.status(404).send({ message: 'No files found' });
+    }
+    const fileLinks = files.map(file => ({
+      name: file.name,
+      id: file.id,
+    }));
+    res.status(200).send({ data: fileLinks });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ message: 'Internal server error' });
+  }
+};
+
+export const downloadFileById = async (
+  req: JwtRequest<{ fileId: string }>,
+  res: Response,
+) => {
+  const fileUploadRepository = AppDataSource.getRepository(FileUpload);
+
+  try {
+    const file = await fileUploadRepository.findOneOrFail({
+      where: { id: parseInt(req.params.fileId) },
+    });
+
+    if (!file) {
+      return res.status(404).send({ message: 'File not found' });
+    }
+
+    const filePath = path.resolve(file.link);
+
+    res.download(filePath, file.name, err => {
+      if (err) {
+        console.error('❌ Error sending file:', err);
+        res.status(500).send({ message: 'Error downloading file' });
+      } else {
+        console.log('✅ File sent successfully!');
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ message: 'Internal server error' });
   }
 };
 

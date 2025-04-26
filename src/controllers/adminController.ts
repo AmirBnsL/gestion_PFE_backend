@@ -108,6 +108,7 @@ const rejectProject = async (
   res.status(200).send({ data: 'Project has been rejected' });
 };
 
+//TODO: add admin adding students using xml or something
 export {
   getTeachers,
   getStudents,
