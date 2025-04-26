@@ -43,7 +43,7 @@ const options: DataSourceOptions & SeederOptions = {
   password: process.env['DB_PASS'],
   database: process.env['DB_NAME'],
   synchronize: true,
-  logging: true,
+  logging: false,
   entities: [
     User,
     Student,

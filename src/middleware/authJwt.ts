@@ -5,6 +5,9 @@ import * as fs from 'node:fs';
 import { Request } from 'express';
 import { IncomingHttpHeaders } from 'node:http2';
 import { AppDataSource } from '../configs/datasource';
+import { Socket } from 'socket.io';
+import { S } from '@faker-js/faker/dist/airline-CBNP41sR';
+import { WebSocket } from 'socket.io-client';
 
 const private_key = fs.readFileSync('private.pem', 'utf8');
 const public_key = fs.readFileSync('public.pem', 'utf8');
@@ -53,18 +56,32 @@ const verifyJwt = (token: string) => {
     throw new Error('Invalid token');
   }
 };
+export const jwtFilter = (req: JwtRequest, next: any) => {
+  return createJwtHandler({ req }, next);
+};
 
-export const jwtFilter = async (req: JwtRequest, res: any, next: any) => {
-  const token = req.headers.authorization;
+export const createJwtHandler = async (
+  context: { req?: JwtRequest; socket?: any },
+  next: any,
+) => {
+  const token =
+    context.req?.headers.authorization ||
+    context.socket.handshake.headers.authorization;
   const userRepository = AppDataSource.getRepository(User);
+  console.log('Token:', token);
   if (!token) {
-    return res.status(StatusCodes.UNAUTHORIZED).send({ data: 'Unauthorized' });
+    return context.req
+      ? context.req.res
+          ?.status(StatusCodes.UNAUTHORIZED)
+          .send({ data: 'Unauthorized' })
+      : context.socket?.disconnect(true);
   }
+
   const [bearer, tokenValue] = token.split(' ');
   try {
     const email = verifyJwt(tokenValue).sub;
 
-    req.user = await userRepository.findOneOrFail({
+    const user = await userRepository.findOneOrFail({
       where: { email: email },
       relations: {
         teacher: true,
@@ -72,10 +89,20 @@ export const jwtFilter = async (req: JwtRequest, res: any, next: any) => {
         admin: true,
       },
     });
-    console.log(req.user);
+    console.log('User:', user);
+
+    if (context.req) {
+      context.req.user = user;
+    } else if (context.socket) {
+      context.socket.user = user;
+      console.log('Socket user:', context.socket.user);
+    }
+
     next();
   } catch (error) {
-    return res.status(401).send({ data: error });
+    return context.req
+      ? context.req.res?.status(401).send({ data: error })
+      : context.socket?.disconnect(true);
   }
 };
 

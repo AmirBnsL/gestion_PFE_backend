@@ -4,5 +4,7 @@
 *.js
 private.key
 public.key
+public.pem
+private.pem
 
 /uploads/projectFiles/*
