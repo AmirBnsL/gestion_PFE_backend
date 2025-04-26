@@ -16,6 +16,7 @@ import { Task } from './Task';
 import { SupervisorInvite } from './SupervisorInvite';
 import { ProjectSettings } from './ProjectSettings';
 import { TeamJoinProjectRequest } from './TeamJoinProjectRequest';
+import { FileUpload } from './File';
 
 export enum ProjectStatus {
   PROPOSED = 'proposed',
@@ -96,4 +97,7 @@ export class Project {
 
   @OneToOne(() => ProjectSettings, projectSettings => projectSettings.project)
   settings: ProjectSettings;
+
+  @OneToMany(() => FileUpload, file => file.project)
+  files: FileUpload[];
 }
