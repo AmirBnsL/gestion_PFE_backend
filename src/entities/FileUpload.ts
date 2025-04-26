@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Project } from './Project';
 
-@Entity()
+@Entity('file_upload')
 export class FileUpload {
   @PrimaryGeneratedColumn()
   id: number;
