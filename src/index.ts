@@ -22,6 +22,7 @@ import taskRoutes from './routes/taskRoutes';
 import { errorHandler } from './middleware/errorHandler';
 import studentRoutes from './routes/studentRoutes';
 import populateDatabase from './dataloader/populateDB';
+import chatSockets from './sockets/chatSockets';
 
 AppDataSource.initialize()
   .then(async () => {
@@ -64,11 +65,24 @@ const app: Express = express();
 
 const server = createServer(app);
 
-export const io = new Server(server);
-
+export const io = new Server(server, {
+  cors: {
+    origin: true, // Allow all origins with credentials
+    methods: ['GET', 'POST'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  },
+  transports: ['websocket', 'polling'], // Try websocket first, then fall back to polling
+});
+chatSockets(io);
 app.use(express.json());
 app.use(morgan('dev'));
-app.use(cors());
+app.use(
+  cors({
+    origin: '*', // or use 'http://127.0.0.1:5500' for stricter security
+    methods: ['GET', 'POST'],
+  }),
+);
 
 const port = process.env.PORT || 8080;
 app.use('/api-docs', swagger.serve, swagger.setup(swaggerSpec));
@@ -91,3 +105,5 @@ server.listen(port, () => {
 
 app.use(errorHandler);
 //TODO : Authorization, Authentication ,CRUD of users,One to one relation ship with users
+// In your index.ts file, add this line after app initialization
+app.use(express.static('public'));

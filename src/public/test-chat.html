@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Chat Socket Test</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .container {
+        display: flex;
+        gap: 20px;
+      }
+      .chat-container {
+        flex: 1;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 15px;
+      }
+      .announcements-container {
+        flex: 1;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 15px;
+      }
+      .controls {
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: #f5f5f5;
+        border-radius: 5px;
+      }
+      input,
+      button {
+        padding: 8px;
+        margin: 5px 0;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 3px;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      #chatLog,
+      #announcementLog {
+        height: 300px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border-radius: 3px;
+      }
+      .message {
+        margin: 5px 0;
+        padding: 5px;
+        border-bottom: 1px solid #eee;
+      }
+      .system {
+        color: #888;
+        font-style: italic;
+      }
+      .announcement {
+        background-color: #fffde7;
+        padding: 8px;
+        margin: 5px 0;
+        border-left: 3px solid #ffd600;
+      }
+      .connection-status {
+        padding: 5px 10px;
+        border-radius: 3px;
+        display: inline-block;
+        margin-bottom: 10px;
+      }
+      .connected {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+      }
+      .disconnected {
+        background-color: #ffebee;
+        color: #c62828;
+      }
+      #debugInfo {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #f0f0f0;
+        border-radius: 5px;
+        font-family: monospace;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Socket.IO Test Client</h1>
+
+    <div class="container">
+      <div class="chat-container">
+        <h2>Chat Room</h2>
+        <div id="chatStatus" class="connection-status disconnected">
+          Disconnected
+        </div>
+
+        <div class="controls">
+          <div>
+            <label>Room ID:</label>
+            <input id="roomInput" type="text" value="room1" />
+          </div>
+          <div>
+            <label>User ID:</label>
+            <input id="userInput" type="text" value="user1" />
+          </div>
+          <div>
+            <button onclick="joinRoom()">Join Room</button>
+            <button onclick="leaveRoom()">Leave Room</button>
+          </div>
+        </div>
+
+        <div class="controls">
+          <input
+            id="messageInput"
+            type="text"
+            placeholder="Enter message..."
+            style="width: 70%"
+          />
+          <button onclick="sendMessage()">Send</button>
+        </div>
+
+        <div id="chatLog"></div>
+      </div>
+
+      <div class="announcements-container">
+        <h2>Announcements</h2>
+        <div id="announcementStatus" class="connection-status disconnected">
+          Disconnected
+        </div>
+
+        <div class="controls">
+          <div>
+            <label>Admin Password:</label>
+            <input id="adminPassword" type="password" value="admin" />
+          </div>
+          <div>
+            <input
+              id="announcementInput"
+              type="text"
+              placeholder="Announcement message..."
+              style="width: 70%"
+            />
+            <button onclick="publishAnnouncement()">Publish</button>
+          </div>
+        </div>
+
+        <div id="announcementLog"></div>
+      </div>
+    </div>
+
+    <div id="debugInfo">Connection Debug Info:</div>
+
+    <div class="controls">
+      <label>Server URL (change if needed):</label>
+      <input id="serverUrlInput" type="text" style="width: 70%" />
+      <button onclick="reconnect()">Reconnect</button>
+    </div>
+
+    <script>
+      // Debug function to display connection info
+      function updateDebugInfo(info) {
+        const debugEl = document.getElementById('debugInfo');
+        debugEl.textContent = 'Connection Debug Info:\n' + info;
+      }
+
+      // Get the server URL from the current page or use localhost as fallback
+      let serverUrl =
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1'
+          ? `http://${window.location.hostname}:${window.location.port || 8080}`
+          : window.location.origin;
+
+      document.getElementById('serverUrlInput').value = serverUrl;
+
+      console.log(`Attempting to connect to server: ${serverUrl}`);
+      updateDebugInfo(`Attempting to connect to server: ${serverUrl}`);
+
+      // Socket.IO options with explicit configuration
+      const socketOptions = {
+        transports: ['websocket', 'polling'],
+        forceNew: true,
+        reconnectionAttempts: 5,
+        timeout: 10000,
+      };
+
+      // Main chat socket
+      let socket = io(serverUrl, socketOptions);
+
+      // Announcements socket (separate namespace)
+      let announcementsSocket = io(`${serverUrl}/announcements`, socketOptions);
+
+      function reconnect() {
+        // Get the updated server URL
+        serverUrl = document.getElementById('serverUrlInput').value;
+
+        // Disconnect existing connections
+        if (socket) socket.disconnect();
+        if (announcementsSocket) announcementsSocket.disconnect();
+
+        // Update debug info
+        updateDebugInfo(`Attempting to connect to server: ${serverUrl}`);
+
+        // Create new connections
+        socket = io(serverUrl, socketOptions);
+        announcementsSocket = io(`${serverUrl}/announcements`, socketOptions);
+
+        // Set up all event listeners again
+        setupEventListeners();
+      }
+
+      function setupEventListeners() {
+        // Connection status for main socket
+        socket.on('connect', () => {
+          logChat('System', 'Connected to chat server', true);
+          document.getElementById('chatStatus').textContent = 'Connected';
+          document.getElementById('chatStatus').className =
+            'connection-status connected';
+          updateDebugInfo(
+            `Connected to chat server: ${serverUrl}\nSocket ID: ${socket.id}`,
+          );
+        });
+
+        socket.on('connect_error', error => {
+          console.error('Chat connection error:', error);
+          logChat('System', `Connection error: ${error.message}`, true);
+          document.getElementById('chatStatus').textContent =
+            'Connection Error';
+          document.getElementById('chatStatus').className =
+            'connection-status disconnected';
+          updateDebugInfo(
+            `Connection error: ${error.message}\nServer URL: ${serverUrl}\nTransport: ${socket.io.engine.transport.name}`,
+          );
+        });
+
+        socket.on('disconnect', reason => {
+          logChat('System', `Disconnected from chat server: ${reason}`, true);
+          document.getElementById('chatStatus').textContent = 'Disconnected';
+          document.getElementById('chatStatus').className =
+            'connection-status disconnected';
+          updateDebugInfo(`Disconnected from chat server: ${reason}`);
+        });
+
+        // Connection status for announcements socket
+        announcementsSocket.on('connect', () => {
+          logAnnouncement('Connected to announcements channel', true);
+          document.getElementById('announcementStatus').textContent =
+            'Connected';
+          document.getElementById('announcementStatus').className =
+            'connection-status connected';
+        });
+
+        announcementsSocket.on('connect_error', error => {
+          console.error('Announcements connection error:', error);
+          logAnnouncement(`Connection error: ${error.message}`, true);
+          document.getElementById('announcementStatus').textContent =
+            'Connection Error';
+          document.getElementById('announcementStatus').className =
+            'connection-status disconnected';
+        });
+
+        announcementsSocket.on('disconnect', reason => {
+          logAnnouncement(
+            `Disconnected from announcements channel: ${reason}`,
+            true,
+          );
+          document.getElementById('announcementStatus').textContent =
+            'Disconnected';
+          document.getElementById('announcementStatus').className =
+            'connection-status disconnected';
+        });
+
+        // Chat message events
+        socket.on('chatMessage', ({ sender, message }) => {
+          logChat(sender, message);
+        });
+
+        socket.on('message', message => {
+          logChat('System', message, true);
+        });
+
+        socket.on('error', data => {
+          logChat('Error', data.message, true);
+        });
+
+        // Announcement events
+        announcementsSocket.on('announcement', data => {
+          const time = new Date(data.timestamp).toLocaleTimeString();
+          logAnnouncement(`${data.message} (${time})`);
+        });
+
+        announcementsSocket.on('error', data => {
+          logAnnouncement(`Error: ${data.message}`, true);
+        });
+      }
+
+      // Set up initial event listeners
+      setupEventListeners();
+
+      // Chat functions
+      function joinRoom() {
+        const room = document.getElementById('roomInput').value;
+        const id = document.getElementById('userInput').value;
+
+        if (!room || !id) {
+          logChat('System', 'Room ID and User ID are required', true);
+          return;
+        }
+
+        socket.emit('joinRoom', { id, room });
+        logChat('System', `Attempting to join room: ${room}`, true);
+      }
+
+      function leaveRoom() {
+        const room = document.getElementById('roomInput').value;
+        const id = document.getElementById('userInput').value;
+
+        if (!room || !id) {
+          logChat('System', 'Room ID and User ID are required', true);
+          return;
+        }
+
+        socket.emit('leaveRoom', { id, room });
+        logChat('System', `Leaving room: ${room}`, true);
+      }
+
+      function sendMessage() {
+        const room = document.getElementById('roomInput').value;
+        const message = document.getElementById('messageInput').value;
+        const sender = document.getElementById('userInput').value;
+
+        if (!room || !message || !sender) {
+          logChat('System', 'Room ID, message, and User ID are required', true);
+          return;
+        }
+
+        socket.emit('chatMessage', { room, message, sender });
+        logChat(sender, message); // Show own message immediately
+        document.getElementById('messageInput').value = '';
+      }
+
+      function publishAnnouncement() {
+        const message = document.getElementById('announcementInput').value;
+        const password = document.getElementById('adminPassword').value;
+
+        if (!message) {
+          logAnnouncement('Announcement message is required', true);
+          return;
+        }
+
+        // Simple admin check (in a real app, this would be handled securely on the server)
+        const isAdmin = password === 'admin';
+
+        announcementsSocket.emit('publishAnnouncement', {
+          message,
+          isAdmin,
+        });
+
+        if (isAdmin) {
+          logAnnouncement(`Sending announcement: ${message}`, true);
+        } else {
+          logAnnouncement(
+            'You need admin privileges to publish announcements',
+            true,
+          );
+        }
+
+        document.getElementById('announcementInput').value = '';
+      }
+
+      // Logging functions
+      function logChat(sender, message, isSystem = false) {
+        const logEl = document.getElementById('chatLog');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = isSystem ? 'message system' : 'message';
+        messageDiv.textContent = isSystem
+          ? `⚠️ ${message}`
+          : `${sender}: ${message}`;
+        logEl.appendChild(messageDiv);
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+
+      function logAnnouncement(message, isSystem = false) {
+        const logEl = document.getElementById('announcementLog');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = isSystem
+          ? 'announcement system'
+          : 'announcement';
+        messageDiv.textContent = isSystem ? `⚠️ ${message}` : message;
+        logEl.appendChild(messageDiv);
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+
+      // Add keyboard event listeners
+      document
+        .getElementById('messageInput')
+        .addEventListener('keydown', function (event) {
+          if (event.key === 'Enter') {
+            sendMessage();
+          }
+        });
+
+      document
+        .getElementById('announcementInput')
+        .addEventListener('keydown', function (event) {
+          if (event.key === 'Enter') {
+            publishAnnouncement();
+          }
+        });
+
+      document
+        .getElementById('serverUrlInput')
+        .addEventListener('keydown', function (event) {
+          if (event.key === 'Enter') {
+            reconnect();
+          }
+        });
+    </script>
+  </body>
+</html>
