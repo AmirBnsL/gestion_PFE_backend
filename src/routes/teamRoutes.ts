@@ -14,6 +14,7 @@ import {
   getTeamLeaderInvites,
   getWishList,
   getMyTeam,
+  getTeams,
 } from '../controllers/teamController';
 import { UserRole } from '../entities/User';
 import {
@@ -535,6 +536,34 @@ router.get(
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore
   getMyTeam,
+);
+
+/**
+ * @swagger
+ * /api/teams:
+ *   get:
+ *     summary: Get all teams
+ *     tags: [Teams]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: An array of teams
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Team'
+ *       403:
+ *         description: Unauthorized
+ */
+
+router.get(
+  '/teams',
+  jwtFilter,
+  authorizeRoles([UserRole.STUDENT, UserRole.TEACHER, UserRole.ADMIN]),
+  getTeams,
 );
 
 export default router;

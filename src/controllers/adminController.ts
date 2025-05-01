@@ -2,9 +2,12 @@ import { AppDataSource } from '../configs/datasource';
 import { Teacher } from '../entities/Teacher';
 import { PageQuery, ResponseDTO } from '../dtos/genericDTOs';
 import { Request, Response } from 'express';
-import { Student } from '../entities/Student';
+import { AcademicYear, Student } from '../entities/Student';
 import { Project, ProjectStatus } from '../entities/Project';
 import { User } from '../entities/User';
+import { applyRelations } from 'typeorm-extension';
+import { JwtRequest } from '../middleware/authJwt';
+import { Parameter } from '../entities/Parameter';
 
 const getTeachers = async (
   req: Request<{}, {}, {}, PageQuery>,
@@ -15,6 +18,9 @@ const getTeachers = async (
   const teachers = await teacherRepository.findAndCount({
     take: parseInt(req.query.size),
     skip: parseInt(req.query.size) * (parseInt(req.query.page) - 1),
+    relations: {
+      user: true,
+    },
   });
   res.status(200).send({ data: teachers[0] });
 };
@@ -28,6 +34,9 @@ const getStudents = async (
   const students = await studentRepository.findAndCount({
     take: parseInt(req.query.size),
     skip: parseInt(req.query.size) * (parseInt(req.query.page) - 1),
+    relations: {
+      user: true,
+    },
   });
   res.status(200).send({ data: students[0] });
 };
@@ -106,6 +115,36 @@ const rejectProject = async (
   project.status = ProjectStatus.REJECTED;
   await projectRepository.save(project);
   res.status(200).send({ data: 'Project has been rejected' });
+};
+
+export const updateParameters = async (
+  req: JwtRequest<{}, Parameter>,
+  res: Response<ResponseDTO<string>>,
+) => {
+  const parameterRepository = AppDataSource.getRepository(Parameter);
+
+  try {
+    const parameter = await parameterRepository.findOneOrFail({
+      where: { year: req.body.year },
+    });
+    parameter.maxTeamSize = req.body.maxTeamSize;
+    parameter.allowTeamCreation = req.body.allowTeamCreation;
+    parameter.allowTeamJoining = req.body.allowTeamJoining;
+    parameter.allowWishListCreation = req.body.allowWishListCreation;
+    await parameterRepository.save(parameter);
+    res.status(200).send({ data: 'Parameter has been updated' });
+  } catch (e) {
+    res.status(404).send({ data: 'Parameter not found' });
+  }
+};
+
+export const getAllParameters = async (
+  req: Request<{}, Parameter>,
+  res: Response<ResponseDTO<Parameter[]>>,
+) => {
+  const parameterRepository = AppDataSource.getRepository(Parameter);
+  const parameters = await parameterRepository.find();
+  res.status(200).send({ data: parameters });
 };
 
 //TODO: add admin adding students using xml or something

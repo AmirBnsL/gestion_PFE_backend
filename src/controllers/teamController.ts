@@ -688,3 +688,17 @@ export const getMyTeam = async (req: JwtRequest, res: Response) => {
     res.status(500).send({ data: 'Internal server error' });
   }
 };
+
+export const getTeams = async (req: Request, res: Response) => {
+  const teamRepository = AppDataSource.getRepository(Team);
+
+  try {
+    const teams = await teamRepository.find({
+      relations: { members: true, teamLeader: true },
+    });
+
+    res.status(200).send({ data: teams });
+  } catch (e) {
+    res.status(500).send({ data: 'Internal server error' });
+  }
+};
