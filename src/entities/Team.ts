@@ -16,6 +16,7 @@ import { TeamJoinRequest } from './TeamJoinRequest';
 import Specialty from '../enums/specialty';
 import { WishList } from './WishList';
 import { TeamJoinProjectRequest } from './TeamJoinProjectRequest';
+import { Sprint } from './Sprint';
 
 @Entity()
 @Unique(['name'])
@@ -60,4 +61,7 @@ export class Team {
   //TODO: wishlist must when admin allows it through parameters
   @OneToOne(() => WishList, wishList => wishList.team, { cascade: true })
   wishList: WishList;
+
+  @OneToMany(() => Sprint, sprint => sprint.team)
+  sprints: Sprint[];
 }

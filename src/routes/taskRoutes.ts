@@ -1,10 +1,7 @@
 import { Router } from 'express';
 import { UserRole } from '../entities/User';
 import { authorizeRoles, jwtFilter } from '../middleware/authJwt';
-import {
-  createTask,
-  getTasksByProjectId,
-} from '../controllers/tasksController';
+import { createTask, getTasksBySprintId } from '../controllers/tasksController';
 import { taskCreationSchema, validateBody } from '../middleware/validation';
 
 const router = Router();
@@ -75,18 +72,18 @@ router.post(
 
 /**
  * @swagger
- * /api/project/{projectId}/tasks:
+ * /api/sprint/{sprintId}/tasks:
  *   get:
  *     summary: Get tasks by project ID
  *     tags:
  *       - Tasks
  *     parameters:
  *       - in: path
- *         name: projectId
+ *         name: sprintId
  *         schema:
  *           type: number
  *         required: true
- *         description: The ID of the project
+ *         description: The ID of the sprint
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -104,10 +101,10 @@ router.post(
  *         description: Internal server error
  */
 router.get(
-  '/project/:projectId/tasks',
+  '/sprint/:sprintId/tasks',
   jwtFilter,
   authorizeRoles([UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT]),
-  getTasksByProjectId,
+  getTasksBySprintId,
 );
 
 export default router;

@@ -5,24 +5,20 @@ import { EntityNotFoundError } from 'typeorm';
 import { Request, Response } from 'express';
 import { TaskDTO, TaskRequestDTO } from '../dtos/taskDTOS';
 import { Student } from '../entities/Student';
+import { Sprint } from '../entities/Sprint';
 
-export const getTasksByProjectId = async (
-  req: Request<{ projectId: string }>,
+export const getTasksBySprintId = async (
+  req: Request<{ sprintId: string }>,
   res: Response,
 ) => {
   try {
     const taskRepository = AppDataSource.getRepository(Task);
 
     const projectRepository = AppDataSource.getRepository(Project);
-    const project = await projectRepository.findOneOrFail({
-      where: { id: parseInt(req.params.projectId) },
-    });
 
     const tasks = await taskRepository.find({
-      where: { project: { id: project.id } },
-      loadRelationIds: {
-        relations: ['assignedTo'], // Load only the IDs for assignedTo
-      },
+      where: { sprint: { id: parseInt(req.params.sprintId) } },
+      relations: ['assignedTo'], // Load only the IDs for assignedTo
     });
     res.status(200).send({ data: tasks });
   } catch (e) {
@@ -43,22 +39,21 @@ export const createTask = async (
 ) => {
   try {
     const taskRepository = AppDataSource.getRepository(Task);
-    const projectRepository = AppDataSource.getRepository(Project);
+    const sprintRepository = AppDataSource.getRepository(Sprint);
     const studentRepository = AppDataSource.getRepository(Student);
 
-    const project = await projectRepository.findOneOrFail({
-      where: { id: req.body.projectId },
+    const sprint = await sprintRepository.findOneOrFail({
+      where: { id: req.body.sprintId },
       relations: ['team'],
     });
 
-    if (project.status === 'COMPLETED') {
+    if (sprint.status === 'COMPLETED') {
       res.status(400).send({ message: 'Project is already completed' });
       return;
     }
 
     const students: Student[] = [];
-    const teamId = project.team.filter(team => team.id === req.body.teamId)[0]
-      .id;
+    const teamId = sprint.team.id;
 
     for (const studentId of req.body.assignedTo) {
       const student = await studentRepository.findOneOrFail({
@@ -77,7 +72,7 @@ export const createTask = async (
     const task = new Task();
     task.title = req.body.title;
     task.description = req.body.description;
-    task.project = project;
+    task.sprint = sprint;
     task.assignedTo = students;
     task.dueDate = req.body.dueDate;
     task.priority = req.body.priority;

@@ -10,6 +10,8 @@ import {
 import { Student } from './Student';
 import { Project } from './Project';
 import { Priority } from './Announcement';
+import { Sprint } from './Sprint';
+import { nullable } from 'zod';
 
 export enum TaskStatus {
   TODO = 'TODO',
@@ -34,7 +36,7 @@ export class Task {
   })
   status: TaskStatus;
 
-  @ManyToMany(() => Student, student => student.tasks)
+  @ManyToMany(() => Student, student => student.tasks, { nullable: false })
   @JoinTable()
   assignedTo: Student[];
 
@@ -47,6 +49,6 @@ export class Task {
   @Column()
   dueDate: Date;
 
-  @ManyToOne(() => Project, project => project.tasks)
-  project: Project;
+  @ManyToOne(() => Sprint, sprint => sprint.tasks, { nullable: false })
+  sprint: Sprint;
 }

@@ -8,7 +8,7 @@ export class TaskRequestDTO {
   assignedTo: number[]; // IDs of the assigned students
   priority: Priority;
   dueDate: Date;
-  projectId: number; // ID of the project
+  sprintId: number; // ID of the project
   teamId: number; // ID of the team
 }
 
@@ -20,7 +20,7 @@ export class TaskDTO {
   assignedTo: number[]; // IDs of the assigned students
   priority: Priority;
   dueDate: Date;
-  projectId: number; // ID of the project
+  sprintId: number; // ID of the project
 
   static toDTO(task: Task): TaskDTO {
     return {
@@ -31,7 +31,7 @@ export class TaskDTO {
       assignedTo: task.assignedTo.map(student => student.id),
       priority: task.priority,
       dueDate: task.dueDate,
-      projectId: task.project.id,
+      sprintId: task.sprint.id,
     };
   }
 }

@@ -108,7 +108,7 @@ export class TaskSeeder implements Seeder {
       for (const team of project.team) {
         for (let i = 0; i < 5; i++) {
           const task = await taskFactory.save();
-          task.project = project;
+
           //TODO: fix this
           await dataSource.getRepository(Task).save(task);
         }

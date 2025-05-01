@@ -34,6 +34,7 @@ import { SupervisorInvite } from '../entities/SupervisorInvite';
 import { ProjectSettings } from '../entities/ProjectSettings';
 import { TeamJoinProjectRequest } from '../entities/TeamJoinProjectRequest';
 import { FileUpload } from '../entities/FileUpload';
+import { Sprint } from '../entities/Sprint';
 const options: DataSourceOptions & SeederOptions = {
   type: 'mysql',
   driver: mysql2,
@@ -63,6 +64,7 @@ const options: DataSourceOptions & SeederOptions = {
     ProjectSettings,
     TeamJoinProjectRequest,
     FileUpload,
+    Sprint,
   ],
   subscribers: [],
   migrations: [],

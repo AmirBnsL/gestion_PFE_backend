@@ -17,6 +17,7 @@ import { SupervisorInvite } from './SupervisorInvite';
 import { ProjectSettings } from './ProjectSettings';
 import { TeamJoinProjectRequest } from './TeamJoinProjectRequest';
 import { FileUpload } from './FileUpload';
+import { Sprint } from './Sprint';
 
 export enum ProjectStatus {
   PROPOSED = 'proposed',
@@ -62,8 +63,8 @@ export class Project {
   @ManyToMany(() => Teacher, teacher => teacher.supervisedProjects)
   supervisedBy: Teacher[];
 
-  @OneToMany(() => Task, task => task.project)
-  tasks: Task[];
+  @OneToMany(() => Sprint, sprint => sprint.project)
+  sprints: Sprint[];
 
   @OneToMany(() => Team, team => team.project)
   team: Team[];
