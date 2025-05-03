@@ -59,13 +59,8 @@ export const createTeam = async (
   res: Response,
 ) => {
   try {
-    const parameterRepository = AppDataSource.getRepository(Parameter);
-
     const user = req.user;
     const student = user.student;
-    const parameters = await parameterRepository.findOneOrFail({
-      where: { year: student.academicYear },
-    });
 
     const teamMembershipRepository =
       AppDataSource.getRepository(TeamMembership);
@@ -675,7 +670,7 @@ export const getMyTeam = async (req: JwtRequest, res: Response) => {
         user: { id: user.id },
       },
       relations: {
-        teamMembership: { team: true },
+        teamMembership: { team: { members: true } },
       },
     });
 
@@ -689,12 +684,56 @@ export const getMyTeam = async (req: JwtRequest, res: Response) => {
   }
 };
 
+export const getMyTeamFull = async (req: JwtRequest, res: Response) => {
+  const studentRepository = AppDataSource.getRepository(Student);
+
+  try {
+    const user = req.user;
+
+    const student = await studentRepository.findOne({
+      where: {
+        user: { id: user.id },
+      },
+      relations: {
+        teamMembership: {
+          team: {
+            project: true, // Assuming 'project' relation exists on Team
+            members: { student: true }, // Load the members of the team
+            // Ensure other necessary relations like teamLeader are loaded if needed by the client
+          },
+        },
+      },
+    });
+
+    if (!student) {
+      return res.status(404).send({ data: 'Student not found' });
+    }
+
+    // Check if the student actually has a team membership
+    if (!student.teamMembership || !student.teamMembership.team) {
+      // You might return an empty object, null, or a specific message
+      // depending on how the frontend should handle a student without a team.
+      return res.status(404).send({ data: 'Student is not part of any team' });
+      // Or: return res.status(200).send({ data: null });
+    }
+
+    // Log the team data before sending to check members
+    console.log('Team data:', student);
+
+    // The team data including members should now be available
+    return res.status(200).send({ data: student.teamMembership.team });
+  } catch (e) {
+    console.error('Error fetching full team data:', e); // Log the actual error
+    res.status(500).send({ data: 'Internal server error' });
+  }
+};
+
 export const getTeams = async (req: Request, res: Response) => {
   const teamRepository = AppDataSource.getRepository(Team);
 
   try {
     const teams = await teamRepository.find({
-      relations: { members: true, teamLeader: true },
+      relations: { members: { student: true }, teamLeader: true },
     });
 
     res.status(200).send({ data: teams });

@@ -4,6 +4,7 @@ import { UserRole } from '../entities/User';
 import { paginationSchema, validateQuery } from '../middleware/validation';
 import {
   getAllParameters,
+  getMyParameter,
   getStudents,
   getTeachers,
   updateParameters,
@@ -187,9 +188,39 @@ router.put(
 router.get(
   '/parameters',
   jwtFilter,
-  authorizeRoles([UserRole.ADMIN]),
+  authorizeRoles([UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT]),
   getAllParameters,
 );
 
+/**
+ * @swagger
+ * /api/me/parameter:
+ *   get:
+ *     summary: Get my year's parameters as an authenticated user
+ *     tags: [Parameters]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: My parameter
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   $ref: '#/components/schemas/Parameter'
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+router.get(
+  '/me/parameter',
+  jwtFilter,
+  authorizeRoles([UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT]),
+  // @ts-ignore
+  getMyParameter,
+);
 //TODO : Add admin interactions with parameters
 export default router;

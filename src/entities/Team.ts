@@ -40,7 +40,7 @@ export class Team {
   @ManyToOne(() => Project, project => project.team, { cascade: true })
   project: Project;
 
-  @OneToMany(() => TeamMembership, membership => membership.student)
+  @OneToMany(() => TeamMembership, membership => membership.team)
   members: TeamMembership[];
 
   // Invites sent by this team

@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from 'express';
+import express, { Express, NextFunction, Request, Response } from 'express';
 import 'reflect-metadata';
 import 'express-async-handler';
 import swagger from 'swagger-ui-express';

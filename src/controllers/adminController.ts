@@ -147,6 +147,17 @@ export const getAllParameters = async (
   res.status(200).send({ data: parameters });
 };
 
+export const getMyParameter = async (
+  req: JwtRequest<{}, Parameter>,
+  res: Response<ResponseDTO<Parameter>>,
+) => {
+  const parameterRepository = AppDataSource.getRepository(Parameter);
+  const parameter = await parameterRepository.findOneOrFail({
+    where: { year: req.user.student.academicYear },
+  });
+  res.status(200).send({ data: parameter });
+};
+
 //TODO: add admin adding students using xml or something
 export {
   getTeachers,

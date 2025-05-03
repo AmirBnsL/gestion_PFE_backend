@@ -15,6 +15,7 @@ import {
   getWishList,
   getMyTeam,
   getTeams,
+  getMyTeamFull,
 } from '../controllers/teamController';
 import { UserRole } from '../entities/User';
 import {
@@ -536,6 +537,38 @@ router.get(
   authorizeRoles([UserRole.STUDENT]),
   // @ts-ignore
   getMyTeam,
+);
+
+/**
+ * @swagger
+ * /api/team/full:
+ *   get:
+ *     summary: Get the team of the currently authenticated student with full details
+ *     tags: [Teams]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: The team of the student
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   $ref: '#/components/schemas/Team'
+ *       403:
+ *         description: Unauthorized
+ *       400:
+ *         description: student not found
+ */
+
+router.get(
+  '/team/full',
+  jwtFilter,
+  authorizeRoles([UserRole.STUDENT]),
+  // @ts-ignore
+  getMyTeamFull,
 );
 
 /**
