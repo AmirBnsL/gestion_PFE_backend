@@ -7,6 +7,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
   ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { User } from './User';
 import { Project } from './Project';
@@ -60,6 +61,7 @@ export class Teacher {
   proposedProjects: Project;
 
   @ManyToMany(() => Project, project => project.supervisedBy)
+  @JoinTable()
   supervisedProjects: Project[];
 
   @OneToMany(() => SupervisorInvite, invite => invite.supervisor)

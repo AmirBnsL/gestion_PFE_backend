@@ -22,6 +22,8 @@ import taskRoutes from './routes/taskRoutes';
 import { errorHandler } from './middleware/errorHandler';
 import studentRoutes from './routes/studentRoutes';
 import populateDatabase from './dataloader/populateDB';
+import supervisionRequestsRoutes from './routes/SupervisionRequestsRoutes';
+import teacherRoutes from './routes/teacherRoutes';
 
 AppDataSource.initialize()
   .then(async () => {
@@ -87,6 +89,8 @@ app.use('/api/', [
   teamRoutes,
   taskRoutes,
   studentRoutes,
+  supervisionRequestsRoutes,
+  teacherRoutes,
 ]);
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TypeScript Server');

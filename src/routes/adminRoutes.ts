@@ -58,7 +58,7 @@ const router = express.Router();
 router.get(
   '/teachers',
   jwtFilter,
-  authorizeRoles([UserRole.ADMIN]),
+  authorizeRoles([UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT]),
   validateQuery(paginationSchema),
   getTeachers,
 );

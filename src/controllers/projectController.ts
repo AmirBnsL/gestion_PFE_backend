@@ -14,13 +14,13 @@ import { FileUpload } from '../entities/FileUpload';
 import path from 'path';
 
 const getProjectOverview = async (
-  req: Request<{ projectId: string }>,
+  req: Request<{ id: string }>,
   res: Response,
 ) => {
   const projectRepository = AppDataSource.getRepository(Project);
   const project = await projectRepository.findOneOrFail({
-    where: { id: parseInt(req.params.projectId) },
-    relations: { proposedBy: true, supervisedBy: true },
+    where: { id: parseInt(req.params.id) },
+    relations: { proposedBy: true, supervisedBy: true, team: true },
   });
   res.status(200).send({ data: project });
 };
@@ -107,7 +107,7 @@ const createAndSaveSupervisorInvite = async (
 };
 
 export const sendProjectSupervisionByTeacher = async (
-  req: JwtRequest<{ teacherId: string }>,
+  req: JwtRequest<{ teacherId: string; projectId: string }>,
   res: Response,
 ) => {
   const projectRepository = AppDataSource.getRepository(Project);
@@ -125,12 +125,18 @@ export const sendProjectSupervisionByTeacher = async (
     }
 
     const project = await projectRepository.findOne({
-      where: { proposedBy: { id: proposer.id } },
+      where: {
+        id: parseInt(req.params.projectId),
+        proposedBy: { id: proposer.id },
+      },
+      relations: ['proposedBy'],
     });
 
     if (!project) {
       return res.status(404).send({ message: 'Project not found' });
     }
+
+    can(user, res).propose(project);
 
     const teacher = await teacherRepository.findOneOrFail({
       where: { id: parseInt(req.params.teacherId) },
@@ -151,7 +157,7 @@ export const sendProjectSupervisionByTeacher = async (
     res.status(201).send({ message: 'Supervision invite sent successfully' });
   } catch (e) {
     console.error(e);
-    res.status(500).send({ message: 'Internal server error' });
+    res.status(500).send({ message: e });
   }
 };
 
@@ -203,14 +209,14 @@ export const acceptProjectSupervisionInviteAsTeacher = async (
   req: JwtRequest<{ requestId: string }>,
   res: Response,
 ) => {
-  await acceptProjectSupervisionRequest(req, res, 'teacher');
+  await acceptProjectSupervisionRequest(req, res, 'proposer');
 };
 
 export const acceptProjectSupervisionInviteAsProposer = async (
   req: JwtRequest<{ requestId: string }>,
   res: Response,
 ) => {
-  await acceptProjectSupervisionRequest(req, res, 'proposer');
+  await acceptProjectSupervisionRequest(req, res, 'teacher');
 };
 
 const acceptProjectSupervisionRequest = async (
@@ -306,7 +312,12 @@ export const sendTeamProjectRequest = async (
     if (!student) {
       return res.status(404).send({ message: 'Student not found' });
     }
-    can(student, res).lead(student.teamMembership.team);
+
+    try {
+      can(user, res).lead(student.teamMembership.team);
+    } catch (e) {
+      return; // Stops execution if forbidden
+    }
 
     if (student.teamMembership.team.project) {
       return res.status(400).send({ message: 'Team already has a project' });
@@ -352,7 +363,11 @@ export const declineTeamProjectRequest = async (
       return res.status(404).send({ message: 'Request not found' });
     }
 
-    can(user.teacher, res).propose(request.project);
+    try {
+      can(user.teacher, res).propose(request.project);
+    } catch (e) {
+      return; // Stops execution if forbidden
+    }
 
     request.status = 'declined';
     await teamJoinProjectRequestRepository.save(request);
@@ -385,7 +400,11 @@ export const acceptTeamProjectRequest = async (
       return res.status(404).send({ message: 'Request not found' });
     }
 
-    can(user.teacher, res).propose(request.project);
+    try {
+      can(user, res).propose(request.project);
+    } catch (e) {
+      return; // Stops execution if forbidden
+    }
 
     request.status = 'accepted';
     await teamJoinProjectRequestRepository.save(request);
@@ -397,11 +416,12 @@ export const acceptTeamProjectRequest = async (
 
     const team = await teamRepository.findOneOrFail({
       where: { id: request.team.id },
-      relations: ['students'],
+      relations: { members: true },
     });
-
+    team.project = project;
     project.team.push(team);
     await projectRepository.save(project);
+    await teamRepository.save(team);
 
     res.status(200).send({ message: 'Request accepted successfully' });
   } catch (error) {
@@ -445,7 +465,12 @@ export const getTeamJoinProjectRequestsForTeam = async (
     if (!student) {
       return res.status(404).send({ message: 'Student not found' });
     }
-    can(student, res).lead(student.teamMembership.team);
+
+    try {
+      can(student, res).lead(student.teamMembership.team);
+    } catch (e) {
+      return; // Stops execution if forbidden
+    }
 
     const requests = await teamJoinProjectRequestRepository.find({
       where: { team: student.teamMembership.team },
@@ -477,7 +502,12 @@ export const getTeamJoinProjectRequestsForProject = async (
     if (!project) {
       return res.status(404).send({ message: 'project not found' });
     }
-    can(user.teacher, res).propose(project);
+
+    try {
+      can(user, res).propose(project);
+    } catch (e) {
+      return; // Stops execution if forbidden
+    }
 
     const requests = project.teamJoinProjectRequests;
 
@@ -503,8 +533,11 @@ export const uploadProjectFile = async (
     if (!project) {
       return res.status(404).send({ message: 'Project not found' });
     }
-    can(user, res).propose(project);
-
+    try {
+      can(user, res).propose(project);
+    } catch (e) {
+      return; // Stops execution if forbidden
+    }
     const files = req.files;
     if (!files) {
       return res.status(400).send({ message: 'File not found' });

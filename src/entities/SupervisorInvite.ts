@@ -8,6 +8,7 @@ import {
 import { Teacher } from './Teacher';
 import { Project } from './Project';
 
+// Represents an invitation for a teacher to supervise a project
 @Entity()
 export class SupervisorInvite {
   @PrimaryGeneratedColumn()

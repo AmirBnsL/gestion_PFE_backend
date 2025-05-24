@@ -244,6 +244,7 @@ router.post(
   '/project/approve/:id',
   jwtFilter,
   authorizeRoles([UserRole.ADMIN]),
+  // @ts-ignore
   approveProject,
 );
 
@@ -391,15 +392,21 @@ router.post(
 
 /**
  * @swagger
- * /api/project/supervise/invite/{teacherId}:
+ * /api/project/{projectId}/supervise/invite/{teacherId}:
  *   post:
- *     summary: Send a supervision request to a teacher for a project as a proposer
+ *     summary: Invite a teacher to supervise a project
  *     tags: [Projects]
  *     parameters:
  *       - in: path
+ *         name: projectId
+ *         required: true
+ *         description: ID of the project to invite a teacher for supervision
+ *         schema:
+ *           type: integer
+ *       - in: path
  *         name: teacherId
  *         required: true
- *         description: ID of the target teacher
+ *         description: ID of the teacher to invite for supervision
  *         schema:
  *           type: integer
  *     security:
@@ -412,9 +419,8 @@ router.post(
  *       401:
  *         description: Unauthorized
  */
-
 router.post(
-  '/project/supervise/invite/:teacherId',
+  '/project/:projectId/supervise/invite/:teacherId',
   jwtFilter,
   authorizeRoles([UserRole.TEACHER]),
   // @ts-ignore
@@ -487,10 +493,17 @@ router.post(
 
 /**
  * @swagger
- * /api/project/team/requests:
+ * /api/project/{projectId}/team/requests:
  *   get:
- *     summary: Get all team join project requests for a project
+ *     summary: Get team join project requests for a project
  *     tags: [Projects]
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         description: ID of the project to get team join requests for
+ *         schema:
+ *           type: integer
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -504,7 +517,7 @@ router.post(
  *                 data:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/Project'
+ *                     $ref: '#/components/schemas/TeamJoinProjectRequest'
  *       400:
  *         description: Invalid request parameters
  *       401:
@@ -512,7 +525,7 @@ router.post(
  */
 
 router.get(
-  '/project/team/requests',
+  '/project/:projectId/team/requests',
   jwtFilter,
   authorizeRoles([UserRole.TEACHER]),
   // @ts-ignore

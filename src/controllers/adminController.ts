@@ -96,9 +96,12 @@ const approveProject = async (
   res: Response<ResponseDTO<string>>,
 ) => {
   const projectRepository = AppDataSource.getRepository(Project);
-  const project = await projectRepository.findOneOrFail({
+  const project = await projectRepository.findOne({
     where: { id: parseInt(req.params.id) },
   });
+  if (!project) {
+    return res.status(404).send({ data: 'Project not found' });
+  }
   project.status = ProjectStatus.APPROVED;
   await projectRepository.save(project);
   res.status(200).send({ data: 'Project has been approved' });

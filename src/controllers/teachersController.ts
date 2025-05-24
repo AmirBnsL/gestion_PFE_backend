@@ -6,13 +6,14 @@ import { Teacher } from '../entities/Teacher';
 import { SupervisorInvite } from '../entities/SupervisorInvite';
 
 export const getTeacherProposedApprovedProjects = async (
-  req: JwtRequest<{ teacherId: string }>,
+  req: JwtRequest,
   res: Response,
 ) => {
+  const teacher = req.user.teacher;
   const projectRepository = AppDataSource.getRepository(Project);
   const projects = await projectRepository.find({
     where: {
-      proposedBy: { id: parseInt(req.params.teacherId) },
+      proposedBy: { id: teacher.id },
       status: ProjectStatus.APPROVED,
     },
   });
@@ -20,13 +21,13 @@ export const getTeacherProposedApprovedProjects = async (
 };
 
 export const getTeacherSupervisedApprovedProjects = async (
-  req: JwtRequest<{ teacherId: string }>,
+  req: JwtRequest,
   res: Response,
 ) => {
   const teacherRepository = AppDataSource.getRepository(Teacher);
 
   const teacher = await teacherRepository.findOne({
-    where: { id: parseInt(req.params.teacherId) },
+    where: { id: req.user.teacher.id },
     relations: {
       supervisedProjects: true,
     },
@@ -59,4 +60,33 @@ export const getProjectSupervisionRequests = async (
   });
 
   res.status(200).send({ data: supervisorInvites });
+};
+
+export const getTeachersSupervisionInvites = async (
+  req: JwtRequest,
+  res: Response,
+) => {
+  const teacherRepository = AppDataSource.getRepository(Teacher);
+  const supervisorInviteRepository =
+    AppDataSource.getRepository(SupervisorInvite);
+
+  const teacher = await teacherRepository.findOne({
+    where: { id: req.user.teacher.id },
+    relations: {
+      supervisorInvites: true,
+    },
+  });
+
+  if (!teacher) {
+    return res.status(404).send({ data: 'Teacher not found' });
+  }
+
+  const invites = await supervisorInviteRepository.find({
+    where: {
+      supervisor: { id: teacher.id },
+      status: 'pending',
+    },
+  });
+
+  res.status(200).send({ data: invites });
 };
