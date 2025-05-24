@@ -32,6 +32,9 @@ export class TeamJoinProjectRequest {
   @Column()
   initiator: string;
 
+  @Column({ default: false })
+  approved: boolean;
+
   @BeforeInsert()
   setCreatedAt() {
     this.createdAt = new Date();

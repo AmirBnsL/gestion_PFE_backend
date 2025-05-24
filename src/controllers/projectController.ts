@@ -20,6 +20,7 @@ const getProjectOverview = async (
   const projectRepository = AppDataSource.getRepository(Project);
   const project = await projectRepository.findOneOrFail({
     where: { id: parseInt(req.params.projectId) },
+    relations: { proposedBy: true, supervisedBy: true },
   });
   res.status(200).send({ data: project });
 };
