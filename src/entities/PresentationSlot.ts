@@ -20,7 +20,7 @@ export class PresentationSlot {
   @ManyToOne(() => PresentationDay, day => day.slots)
   presentationDay: PresentationDay;
 
-  @Column()
+  @Column({ type: 'time' })
   startTime: string;
 
   @Column()

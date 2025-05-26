@@ -7,7 +7,7 @@ export class PresentationDay {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'date' })
   date: Date;
 
   @Column({

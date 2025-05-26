@@ -15,6 +15,7 @@ import {
   updatePresentationDay,
   addSlotToDay,
   getSlotsForDay,
+  getPresentationsForJudge,
 } from '../controllers/presentationDayController';
 import { authorizeRoles, jwtFilter } from '../middleware/authJwt';
 import { UserRole } from '../entities/User';
@@ -266,6 +267,36 @@ router.get(
   jwtFilter,
   authorizeRoles([UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT]),
   getSlotsForDay,
+);
+
+/**
+ * @swagger
+ * /api/teacher/presentationDays:
+ *   get:
+ *     tags:
+ *       - PresentationDays
+ *     summary: Get presentations for a judge
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: A list of presentations for the judge
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Presentation'
+ *       401:
+ *         description: Unauthorized
+ */
+
+router.get(
+  '/teacher/presentationDays',
+  jwtFilter,
+  authorizeRoles([UserRole.TEACHER]),
+  // @ts-ignore
+  getPresentationsForJudge,
 );
 export default router;
 export { router as presentationDayRoutes };

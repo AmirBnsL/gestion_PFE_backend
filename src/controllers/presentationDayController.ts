@@ -7,6 +7,7 @@ import { AcademicYear } from '../enums/AcademicYear';
 import { In } from 'typeorm';
 import { Teacher } from '../entities/Teacher';
 import { Team } from '../entities/Team';
+import { JwtRequest } from '../middleware/authJwt';
 
 export async function createPresentationDay(
   req: Request<
@@ -181,8 +182,32 @@ export async function getSlotsForDay(
       res.status(404).json({ error: 'Presentation day not found' });
       return;
     }
-    res.json({ data: day.slots });
+    res.json({ data: day });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch slots', details: err });
+  }
+}
+
+export async function getPresentationsForJudge(req: JwtRequest, res: Response) {
+  try {
+    const judgeId = req.user.teacher.id;
+    const slotRepo = AppDataSource.getRepository(PresentationSlot);
+    const slots = await slotRepo.find({
+      where: {
+        judges: {
+          id: Number(judgeId),
+        },
+      },
+      relations: ['presentationDay', 'team'],
+    });
+    if (!slots || slots.length === 0) {
+      res.status(404).json({ error: 'No presentations found for this judge' });
+      return;
+    }
+    res.json({ data: slots });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: 'Failed to fetch presentations', details: err });
   }
 }
