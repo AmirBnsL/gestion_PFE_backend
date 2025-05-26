@@ -174,6 +174,32 @@ const TeamSchema = {
   },
 };
 
+const PresentationDaySchema = {
+  type: 'object',
+  properties: {
+    id: { type: 'number' },
+    date: { type: 'string', format: 'date' },
+    academicYear: {
+      type: 'string',
+      enum: [
+        '1st preparatory class',
+        '2nd preparatory class',
+        '1st superior class',
+        '2nd superior class',
+        '3rd superior class',
+      ],
+    },
+    status: {
+      type: 'string',
+      enum: ['draft', 'published'],
+    },
+    presentationSlots: {
+      type: 'array',
+      items: { $ref: '#/components/schemas/PresentationSlot' },
+    },
+  },
+};
+
 const TeamJoinProjectRequestSchema = {
   type: 'object',
   properties: {
@@ -220,6 +246,7 @@ export const options = {
         SupervisorInvite: SupervisorInviteSchema,
         Team: TeamSchema,
         TeamJoinProjectRequest: TeamJoinProjectRequestSchema,
+        PresentationDay: PresentationDaySchema,
       },
     },
     security: [

@@ -6,6 +6,7 @@ import {
   getTeacherProposedApprovedProjects,
   getTeachersSupervisionInvites,
   getTeacherSupervisedApprovedProjects,
+  getMyAllProjects,
 } from '../controllers/teachersController';
 
 const router = Router();
@@ -64,7 +65,7 @@ router.get(
  *                     $ref: '#/components/schemas/Project'
  */
 router.get(
-  '/teacher/:teacherId/projects/supervised',
+  '/teacher/projects/supervised',
   jwtFilter,
   authorizeRoles([UserRole.TEACHER]),
   //@ts-ignore
@@ -139,6 +140,38 @@ router.get(
   authorizeRoles([UserRole.TEACHER]),
   // @ts-ignore
   getTeachersSupervisionInvites,
+);
+
+/**
+ * @swagger
+ * /api/teacher/me/projects:
+ *   get:
+ *     summary: Retrieve all projects for the authenticated teacher
+ *     description: Fetches all projects associated with the authenticated teacher.
+ *     tags:
+ *       - Teachers
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: A list of projects associated with the teacher.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Project'
+ */
+
+router.get(
+  '/teacher/me/projects',
+  jwtFilter,
+  authorizeRoles([UserRole.TEACHER]),
+  // @ts-ignore
+  getMyAllProjects,
 );
 
 export default router;

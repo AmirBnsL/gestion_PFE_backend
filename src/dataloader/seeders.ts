@@ -2,13 +2,13 @@ import { DataSource } from 'typeorm';
 import { Seeder, SeederFactoryManager } from 'typeorm-extension';
 import { User, UserRole } from '../entities/User';
 import { Admin } from '../entities/Admin';
-import { AcademicYear, Student } from '../entities/Student';
+import { Student } from '../entities/Student';
 import { Teacher } from '../entities/Teacher';
 import { Project } from '../entities/Project';
 import { Team } from '../entities/Team';
 import { Task } from '../entities/Task';
 import { Parameter } from '../entities/Parameter';
-
+import { AcademicYear } from '../enums/AcademicYear';
 export class UserSeeder implements Seeder {
   public async run(
     dataSource: DataSource,

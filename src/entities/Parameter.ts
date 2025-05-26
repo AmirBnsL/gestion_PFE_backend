@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { AcademicYear } from './Student';
+import { AcademicYear } from '../enums/AcademicYear';
 
 @Entity()
 export class Parameter {

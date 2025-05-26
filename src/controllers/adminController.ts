@@ -2,7 +2,7 @@ import { AppDataSource } from '../configs/datasource';
 import { Teacher } from '../entities/Teacher';
 import { PageQuery, ResponseDTO } from '../dtos/genericDTOs';
 import { Request, Response } from 'express';
-import { AcademicYear, Student } from '../entities/Student';
+import { Student } from '../entities/Student';
 import { Project, ProjectStatus } from '../entities/Project';
 import { User } from '../entities/User';
 import { applyRelations } from 'typeorm-extension';

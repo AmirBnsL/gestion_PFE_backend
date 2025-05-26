@@ -301,6 +301,8 @@ router.post(
  *                 type: string
  *               specialty :
  *                 type: string
+ *               academicYear:
+ *                 type: string
  *     security:
  *       - bearerAuth: []
  *     responses:

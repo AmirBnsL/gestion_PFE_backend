@@ -24,6 +24,7 @@ import studentRoutes from './routes/studentRoutes';
 import populateDatabase from './dataloader/populateDB';
 import supervisionRequestsRoutes from './routes/SupervisionRequestsRoutes';
 import teacherRoutes from './routes/teacherRoutes';
+import { presentationDayRoutes } from './routes/presentationDayRoutes';
 
 AppDataSource.initialize()
   .then(async () => {
@@ -91,6 +92,7 @@ app.use('/api/', [
   studentRoutes,
   supervisionRequestsRoutes,
   teacherRoutes,
+  presentationDayRoutes,
 ]);
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TypeScript Server');

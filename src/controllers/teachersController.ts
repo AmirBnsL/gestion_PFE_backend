@@ -16,6 +16,13 @@ export const getTeacherProposedApprovedProjects = async (
       proposedBy: { id: teacher.id },
       status: ProjectStatus.APPROVED,
     },
+    relations: {
+      supervisorInvites: { supervisor: { user: true } },
+      proposedBy: true,
+      supervisedBy: { user: true },
+      teamJoinProjectRequests: { team: true },
+      team: { teamLeader: true },
+    },
   });
   res.status(200).send({ data: projects });
 };
@@ -29,7 +36,13 @@ export const getTeacherSupervisedApprovedProjects = async (
   const teacher = await teacherRepository.findOne({
     where: { id: req.user.teacher.id },
     relations: {
-      supervisedProjects: true,
+      supervisedProjects: {
+        supervisorInvites: { supervisor: true },
+        proposedBy: true,
+        supervisedBy: { user: true },
+        teamJoinProjectRequests: { team: true },
+        team: { teamLeader: true },
+      },
     },
   });
 
@@ -89,4 +102,27 @@ export const getTeachersSupervisionInvites = async (
   });
 
   res.status(200).send({ data: invites });
+};
+
+export const getMyAllProjects = async (req: JwtRequest, res: Response) => {
+  const teacherRepository = AppDataSource.getRepository(Teacher);
+  const projectRepository = AppDataSource.getRepository(Project);
+
+  const teacher = await teacherRepository.findOne({
+    where: { id: req.user.teacher.id },
+    relations: {
+      proposedProjects: true,
+      supervisedProjects: true,
+    },
+  });
+
+  if (!teacher) {
+    return res.status(404).send({ data: 'Teacher not found' });
+  }
+
+  const projects = await projectRepository.find({
+    where: [{ proposedBy: { id: teacher.id } }],
+  });
+
+  res.status(200).send({ data: projects });
 };

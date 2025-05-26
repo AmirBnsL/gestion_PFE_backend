@@ -17,6 +17,8 @@ import Specialty from '../enums/specialty';
 import { WishList } from './WishList';
 import { TeamJoinProjectRequest } from './TeamJoinProjectRequest';
 import { Sprint } from './Sprint';
+import { PresentationDay } from './PresentationDay';
+import { PresentationSlot } from './PresentationSlot';
 
 @Entity()
 @Unique(['name'])
@@ -64,4 +66,9 @@ export class Team {
 
   @OneToMany(() => Sprint, sprint => sprint.team)
   sprints: Sprint[];
+
+  @OneToOne(() => PresentationSlot, presentationSlot => presentationSlot.team, {
+    cascade: true,
+  })
+  presentationDay: PresentationSlot;
 }

@@ -51,6 +51,7 @@ const createProject = async (
     project.title = req.body.title;
     project.description = req.body.description;
     project.specialty = req.body.specialty;
+    project.academicYear = req.body.academicYear;
 
     project.proposedBy = teacher;
 

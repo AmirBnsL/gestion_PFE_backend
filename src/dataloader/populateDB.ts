@@ -1,11 +1,11 @@
 import { DataSource } from 'typeorm';
-import { AcademicYear, Student } from '../entities/Student';
+import { Student } from '../entities/Student';
 import { User, UserRole } from '../entities/User';
 import { Rank, Teacher, TeacherRole } from '../entities/Teacher';
 import * as fs from 'fs';
 import * as path from 'path';
-import { AppDataSource } from '../configs/datasource';
 import { faker } from '@faker-js/faker';
+import { AcademicYear } from '../enums/AcademicYear';
 
 const populateDatabase = async (dataSource: DataSource) => {
   const userRepository = dataSource.getRepository(User);

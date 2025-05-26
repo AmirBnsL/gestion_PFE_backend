@@ -12,13 +12,13 @@ import {
 import { Teacher } from './Teacher';
 import { Team } from './Team';
 import Specialty from '../enums/specialty';
-import { Task } from './Task';
+
 import { SupervisorInvite } from './SupervisorInvite';
 import { ProjectSettings } from './ProjectSettings';
 import { TeamJoinProjectRequest } from './TeamJoinProjectRequest';
 import { FileUpload } from './FileUpload';
 import { Sprint } from './Sprint';
-
+import { AcademicYear } from '../enums/AcademicYear';
 export enum ProjectStatus {
   PROPOSED = 'proposed',
   APPROVED = 'approved',
@@ -35,6 +35,12 @@ export class Project {
 
   @Column({ nullable: false })
   title: string;
+
+  @Column({
+    type: 'enum',
+    enum: AcademicYear,
+  })
+  academicYear: AcademicYear;
 
   @Column()
   description: string;

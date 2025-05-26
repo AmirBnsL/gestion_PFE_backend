@@ -2,13 +2,14 @@ import { User, UserRole } from '../entities/User';
 import { setSeederFactory } from 'typeorm-extension';
 import { faker } from '@faker-js/faker';
 import { Admin } from '../entities/Admin';
-import { AcademicYear, Student } from '../entities/Student';
+import { Student } from '../entities/Student';
 import { Rank, Teacher, TeacherRole } from '../entities/Teacher';
 import { Project, ProjectStatus } from '../entities/Project';
 import Specialty from '../enums/specialty';
 import { Team } from '../entities/Team';
 import { Task, TaskStatus } from '../entities/Task';
 import { Priority } from '../entities/Announcement';
+import { AcademicYear } from '../enums/AcademicYear';
 import bcrypt from 'bcryptjs';
 
 export const taskFactory = setSeederFactory(Task, () => {

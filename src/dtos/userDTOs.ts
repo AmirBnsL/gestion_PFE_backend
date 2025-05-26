@@ -1,6 +1,5 @@
 import { UserRole } from '../entities/User';
-import { Column } from 'typeorm';
-import { AcademicYear } from '../entities/Student';
+import { AcademicYear } from '../enums/AcademicYear';
 import { Rank, TeacherRole } from '../entities/Teacher';
 import Specialty from '../enums/specialty';
 

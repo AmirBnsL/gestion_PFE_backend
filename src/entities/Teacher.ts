@@ -12,6 +12,7 @@ import {
 import { User } from './User';
 import { Project } from './Project';
 import { SupervisorInvite } from './SupervisorInvite';
+import { PresentationSlot } from './PresentationSlot';
 
 export enum Rank {
   Assistant = 'Assistant',
@@ -66,4 +67,10 @@ export class Teacher {
 
   @OneToMany(() => SupervisorInvite, invite => invite.supervisor)
   supervisorInvites: SupervisorInvite[];
+
+  @ManyToMany(
+    () => PresentationSlot,
+    presentationSlot => presentationSlot.judges,
+  )
+  presentationSlots: PresentationSlot[];
 }
