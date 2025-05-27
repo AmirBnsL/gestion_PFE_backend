@@ -131,6 +131,8 @@ export class ParameterSeeder implements Seeder {
         year: AcademicYear.FIRST,
         allowTeamJoining: true,
         allowWishListCreation: true,
+        distributionMode: 'manual',
+        maxTeams: 5,
       },
       {
         id: 2,
@@ -139,6 +141,8 @@ export class ParameterSeeder implements Seeder {
         year: AcademicYear.SECOND,
         allowTeamJoining: true,
         allowWishListCreation: true,
+        distributionMode: 'manual',
+        maxTeams: 5,
       },
       {
         id: 3,
@@ -147,6 +151,8 @@ export class ParameterSeeder implements Seeder {
         year: AcademicYear.THIRD,
         allowTeamJoining: true,
         allowWishListCreation: true,
+        distributionMode: 'manual',
+        maxTeams: 5,
       },
       {
         id: 4,
@@ -155,6 +161,8 @@ export class ParameterSeeder implements Seeder {
         year: AcademicYear.FOURTH,
         allowTeamJoining: true,
         allowWishListCreation: true,
+        distributionMode: 'manual',
+        maxTeams: 5,
       },
       {
         id: 5,
@@ -163,6 +171,8 @@ export class ParameterSeeder implements Seeder {
         year: AcademicYear.FIFTH,
         allowTeamJoining: true,
         allowWishListCreation: true,
+        distributionMode: 'manual',
+        maxTeams: 5,
       },
     ];
     for (const parameter of parameters) {

@@ -10,6 +10,8 @@ import {
   updateParameters,
 } from '../controllers/adminController';
 
+import { distributeProject } from '../controllers/projectController';
+
 const router = express.Router();
 
 /**
@@ -231,7 +233,7 @@ router.post(
   jwtFilter,
   authorizeRoles([UserRole.ADMIN]),
   // @ts-ignore
-  distributeProjects,
+  distributeProject,
 );
 //TODO : Add admin interactions with parameters
 export default router;

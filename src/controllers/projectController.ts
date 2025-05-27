@@ -740,4 +740,5 @@ export {
   getProjectOverview,
   getApprovedProjects,
   createProject,
+  distributeProject,
 };
