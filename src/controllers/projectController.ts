@@ -686,7 +686,7 @@ const distributeProject = async (
         .send({ message: 'No approved projects found for this year' });
     }
 
-    if (projects.length < teams.length * parameter.maxTeamSize) {
+    if (projects.length * parameter.maxTeams < teams.length) {
       return res.status(400).send({
         message: 'Not enough approved projects for the number of teams',
       });
@@ -694,15 +694,44 @@ const distributeProject = async (
 
     // Logic to distribute projects to teams
     // This is a placeholder; actual distribution logic will depend on your requirements
+    const assignmentLogs: any[] = [];
+
     for (const project of projects) {
-      if (project.team.length > 0) {
-        console.log(
-          `Distributing project ${project.title} to team ${project.team[0].id}`,
-        );
+      const availableTeams = teams.filter(team => !team.project);
+      if (availableTeams.length === 0) break;
+      const randomIndex = Math.floor(Math.random() * availableTeams.length);
+      const team = availableTeams[randomIndex];
+
+      let assigned = false;
+      for (const wishProjectId of team.wishList.entries) {
+        if (wishProjectId.id === project.id) {
+          team.project = project;
+          project.team.push(team);
+          assigned = true;
+          assignmentLogs.push({
+            projectId: project.id,
+            teamId: team.id,
+            match: true,
+            message: `Assigned project ${project.title} to team ${team.id} (priority match)`,
+          });
+          break;
+        }
       }
+      if (!assigned) {
+        team.project = project;
+        project.team.push(team);
+        assignmentLogs.push({
+          projectId: project.id,
+          teamId: team.id,
+          match: false,
+          message: `Assigned project ${project.title} to team ${team.id} (no wish match)`,
+        });
+      }
+      await projectRepository.save(project);
+      await teamRepository.save(team);
     }
 
-    res.status(200).send({ message: 'Projects distributed successfully' });
+    res.status(200).send({ data: assignmentLogs });
   } catch (e) {}
 };
 
