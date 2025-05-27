@@ -99,6 +99,7 @@ export const getTeachersSupervisionInvites = async (
       supervisor: { id: teacher.id },
       status: 'pending',
     },
+    relations: { project: { proposedBy: { user: true } } },
   });
 
   res.status(200).send({ data: invites });

@@ -25,6 +25,20 @@ const getTeachers = async (
   res.status(200).send({ data: teachers[0] });
 };
 
+export const getTeachersUnpaged = async (
+  req: Request,
+  res: Response<ResponseDTO<Teacher[]>>,
+) => {
+  const teacherRepository = AppDataSource.getRepository(Teacher);
+  console.log(req.query.size);
+  const teachers = await teacherRepository.find({
+    relations: {
+      user: true,
+    },
+  });
+  res.status(200).send({ data: teachers });
+};
+
 const getStudents = async (
   req: Request<{}, {}, {}, PageQuery>,
   res: Response<ResponseDTO<Student[]>>,

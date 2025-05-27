@@ -8,6 +8,10 @@ import {
   getTeacherSupervisedApprovedProjects,
   getMyAllProjects,
 } from '../controllers/teachersController';
+import {
+  getTeachers,
+  getTeachersUnpaged,
+} from '../controllers/adminController';
 
 const router = Router();
 /**
@@ -172,6 +176,38 @@ router.get(
   authorizeRoles([UserRole.TEACHER]),
   // @ts-ignore
   getMyAllProjects,
+);
+
+/**
+ * @swagger
+ * /api/teachers/unpaged:
+ *   get:
+ *     summary: Retrieve all teachers
+ *     description: Fetches a paginated list of all teachers.
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: A list of teachers.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
+ */
+
+router.get(
+  '/teachers/unpaged',
+  jwtFilter,
+  authorizeRoles([UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT]),
+  // @ts-ignore
+  getTeachersUnpaged,
 );
 
 export default router;

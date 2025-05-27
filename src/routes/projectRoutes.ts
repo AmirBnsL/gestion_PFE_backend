@@ -17,6 +17,7 @@ import {
   getProjectFilesLink,
   downloadFileById,
   deleteProject,
+  rejectProjectSupervisionInviteAsTeacher,
 } from '../controllers/projectController';
 import {
   paginationSchema,
@@ -462,6 +463,13 @@ router.post(
   acceptProjectSupervisionInviteAsTeacher,
 );
 
+router.post(
+  '/project/supervise/invite/reject/:requestId',
+  jwtFilter,
+  authorizeRoles([UserRole.TEACHER]),
+  // @ts-ignore
+  rejectProjectSupervisionInviteAsTeacher,
+);
 /**
  * @swagger
  * /api/project/supervise/request/accept/{requestId}:

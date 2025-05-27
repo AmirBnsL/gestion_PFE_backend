@@ -56,6 +56,8 @@ const createProject = async (
     project.academicYear = req.body.academicYear;
 
     project.proposedBy = teacher;
+    project.supervisedBy = [];
+    project.supervisedBy.push(teacher);
 
     await projectRepository.save(project);
     res.status(201).send({ data: 'Project created successfully' });
@@ -213,6 +215,32 @@ export const acceptProjectSupervisionInviteAsTeacher = async (
   res: Response,
 ) => {
   await acceptProjectSupervisionRequest(req, res, 'proposer');
+};
+
+export const rejectProjectSupervisionInviteAsTeacher = async (
+  req: JwtRequest<{ requestId: string }>,
+  res: Response,
+) => {
+  const supervisorInviteRepository =
+    AppDataSource.getRepository(SupervisorInvite);
+  try {
+    const request = await supervisorInviteRepository.findOne({
+      where: { id: parseInt(req.params.requestId), status: 'pending' },
+      relations: ['project', 'supervisor'],
+    });
+
+    if (!request) {
+      return res.status(404).send({ message: 'Request not found' });
+    }
+
+    request.status = 'declined';
+    await supervisorInviteRepository.save(request);
+
+    res.status(200).send({ message: 'Request declined successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Internal server error' });
+  }
 };
 
 export const acceptProjectSupervisionInviteAsProposer = async (
