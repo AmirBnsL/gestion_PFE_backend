@@ -27,7 +27,7 @@ const publishAnnouncement = async (
   res.status(200).send({ data: 'Announcement has been published' });
 };
 
-const getAnnouncments = async (
+const getAnnouncements = async (
   req: Request<{}, {}, {}, PageQuery>,
   res: Response,
 ) => {
@@ -39,4 +39,4 @@ const getAnnouncments = async (
   res.status(200).send({ data: announcements });
 };
 
-export { publishAnnouncement, getAnnouncments };
+export { publishAnnouncement, getAnnouncements };

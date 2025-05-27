@@ -8,6 +8,7 @@ import { In } from 'typeorm';
 import { Teacher } from '../entities/Teacher';
 import { Team } from '../entities/Team';
 import { JwtRequest } from '../middleware/authJwt';
+import { Student } from '../entities/Student';
 
 export async function createPresentationDay(
   req: Request<
@@ -205,6 +206,39 @@ export async function getPresentationsForJudge(req: JwtRequest, res: Response) {
       return;
     }
     res.json({ data: slots });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: 'Failed to fetch presentations', details: err });
+  }
+}
+
+export async function getPresentationForStudent(
+  req: JwtRequest,
+  res: Response,
+) {
+  try {
+    const studentId = req.user.student.id;
+    const studentRepo = AppDataSource.getRepository(Student);
+
+    const student = await studentRepo.findOne({
+      where: { id: Number(studentId) },
+      relations: {
+        teamMembership: {
+          team: { presentationDay: { presentationDay: true } },
+        },
+      },
+    });
+    const team = student?.teamMembership.team;
+
+    if (!team || !team.presentationDay) {
+      res
+        .status(404)
+        .json({ error: 'No presentations found for this student' });
+      return;
+    }
+
+    res.json({ data: team });
   } catch (err) {
     res
       .status(500)

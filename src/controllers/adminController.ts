@@ -134,6 +134,7 @@ export const updateParameters = async (
     parameter.allowTeamCreation = req.body.allowTeamCreation;
     parameter.allowTeamJoining = req.body.allowTeamJoining;
     parameter.allowWishListCreation = req.body.allowWishListCreation;
+    parameter.distributionMode = req.body.distributionMode;
     await parameterRepository.save(parameter);
     res.status(200).send({ data: 'Parameter has been updated' });
   } catch (e) {

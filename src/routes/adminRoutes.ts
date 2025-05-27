@@ -142,6 +142,9 @@ router.get(
  *               year:
  *                 type: string
  *                 enum: [FIRST_YEAR, SECOND_YEAR, THIRD_YEAR, FOURTH_YEAR, FIFTH_YEAR]
+ *               distributionMode:
+ *                 type:string
+ *                 enum: [manual, automatic]
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -221,6 +224,14 @@ router.get(
   authorizeRoles([UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT]),
   // @ts-ignore
   getMyParameter,
+);
+
+router.post(
+  '/project/distribute',
+  jwtFilter,
+  authorizeRoles([UserRole.ADMIN]),
+  // @ts-ignore
+  distributeProjects,
 );
 //TODO : Add admin interactions with parameters
 export default router;

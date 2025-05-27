@@ -6,6 +6,9 @@ export class Parameter {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: false })
+  maxTeams: number;
+
   @Column()
   maxTeamSize: number;
   @Column()
@@ -22,4 +25,7 @@ export class Parameter {
     enum: AcademicYear,
   })
   year: AcademicYear;
+
+  @Column()
+  distributionMode: 'manual' | 'automatic';
 }

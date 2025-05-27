@@ -13,9 +13,6 @@ export class ProjectSettings {
   id: number;
 
   @Column({ nullable: false })
-  maxTeams: number;
-
-  @Column({ nullable: false })
   maxSupervisors: number;
 
   @Column({ nullable: false })

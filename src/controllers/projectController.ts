@@ -12,6 +12,8 @@ import { Student } from '../entities/Student';
 import { TeamJoinProjectRequest } from '../entities/TeamJoinProjectRequest';
 import { FileUpload } from '../entities/FileUpload';
 import path from 'path';
+import { AcademicYear } from '../enums/AcademicYear';
+import { Parameter } from '../entities/Parameter';
 
 const getProjectOverview = async (
   req: Request<{ id: string }>,
@@ -621,6 +623,87 @@ export const downloadFileById = async (
     console.error(error);
     return res.status(500).send({ message: 'Internal server error' });
   }
+};
+
+const distributeProject = async (
+  req: Request<{ year: AcademicYear }>,
+  res: Response,
+) => {
+  try {
+    const year = req.params.year;
+    const parameterRepository = AppDataSource.getRepository(Parameter);
+
+    const parameter = await parameterRepository.findOne({
+      where: { year: year },
+    });
+    if (!parameter) {
+      return res
+        .status(404)
+        .send({ message: 'Parameter not found for this year' });
+    }
+
+    if (parameter.distributionMode !== 'automatic') {
+      return res
+        .status(400)
+        .send({ message: 'Distribution mode is not automatic' });
+    }
+
+    const projectRepository = AppDataSource.getRepository(Project);
+    const projects = await projectRepository.find({
+      where: { academicYear: year, status: ProjectStatus.APPROVED },
+      relations: { team: true },
+    });
+
+    const teamRepository = AppDataSource.getRepository(Team);
+    const teams = await teamRepository.find({
+      where: { teamLeader: { academicYear: year } },
+      relations: { members: true },
+    });
+
+    for (const team of teams) {
+      if (
+        team.members.length === 0 &&
+        parameter.maxTeamSize != team.members.length
+      ) {
+        return res
+          .status(400)
+          .send({ message: 'Team has no members / not max length' });
+      }
+    }
+
+    for (const team of teams) {
+      if (team.wishList.entries.length == 0) {
+        return res
+          .status(400)
+          .send({ message: 'Team has no wish list entries' });
+      }
+    }
+    // Check if there are any approved projects for the specified year
+
+    if (!projects || projects.length === 0) {
+      return res
+        .status(404)
+        .send({ message: 'No approved projects found for this year' });
+    }
+
+    if (projects.length < teams.length * parameter.maxTeamSize) {
+      return res.status(400).send({
+        message: 'Not enough approved projects for the number of teams',
+      });
+    }
+
+    // Logic to distribute projects to teams
+    // This is a placeholder; actual distribution logic will depend on your requirements
+    for (const project of projects) {
+      if (project.team.length > 0) {
+        console.log(
+          `Distributing project ${project.title} to team ${project.team[0].id}`,
+        );
+      }
+    }
+
+    res.status(200).send({ message: 'Projects distributed successfully' });
+  } catch (e) {}
 };
 
 export {

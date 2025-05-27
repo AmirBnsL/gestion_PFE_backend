@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { authorizeRoles, jwtFilter } from '../middleware/authJwt';
 import { UserRole } from '../entities/User';
 import {
-  getAnnouncments,
+  getAnnouncements,
   publishAnnouncement,
 } from '../controllers/announcementsController';
 import {
@@ -103,6 +103,6 @@ router.get(
   '/announcements',
   jwtFilter,
   authorizeRoles([UserRole.ADMIN, UserRole.STUDENT, UserRole.TEACHER]),
-  getAnnouncments,
+  getAnnouncements,
 );
 export default router;
