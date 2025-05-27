@@ -72,6 +72,9 @@ const getProjects = async (
   const projects = await projectRepository.findAndCount({
     take: parseInt(req.query.size),
     skip: parseInt(req.query.size) * (parseInt(req.query.page) - 1),
+    relations: {
+      proposedBy: true,
+    },
   });
   res.status(200).send({ data: projects[0] });
 };

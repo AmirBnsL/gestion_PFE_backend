@@ -16,6 +16,7 @@ import {
   uploadProjectFile,
   getProjectFilesLink,
   downloadFileById,
+  deleteProject,
 } from '../controllers/projectController';
 import {
   paginationSchema,
@@ -716,5 +717,13 @@ router.get(
   authorizeRoles([UserRole.TEACHER]),
   // @ts-ignore
   downloadFileById,
+);
+
+router.delete(
+  '/project/:projectId',
+  jwtFilter,
+  authorizeRoles([UserRole.ADMIN, UserRole.TEACHER]),
+  // @ts-ignore
+  deleteProject,
 );
 export default router;

@@ -735,6 +735,23 @@ const distributeProject = async (
   } catch (e) {}
 };
 
+export const deleteProject = async (
+  req: JwtRequest<{ projectId: string }>,
+  res: Response<ResponseDTO<string>>,
+) => {
+  const projectRepository = AppDataSource.getRepository(Project);
+  try {
+    const project = await projectRepository.findOneOrFail({
+      where: { id: parseInt(req.params.projectId) },
+    });
+    await projectRepository.remove(project);
+    res.status(200).send({ data: 'Project deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ data: 'Failed to delete project' });
+  }
+};
+
 export {
   assignProjectToTeam,
   getProjectOverview,
